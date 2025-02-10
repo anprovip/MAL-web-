@@ -41,9 +41,77 @@ export const AnimeItem = () => {
                 </h1>
                 <div className="details bg-[#ffffff] rounded-[20px] p-[32px] border-[5px] border-[#e5e7eb]">
                     <div className="detail grid grid-cols-2 gap-[32px]">
-                        <div className="image" data-aos="fade-down">
+                        <div className="image relative" data-aos="fade-down">
                             <img src={images?.jpg.large_image_url} alt="" className="rounded-[7px]"/>
+                            
+                            <label
+                                htmlFor={`modal_${id}`}
+                                className="p-0 absolute left-0 mt-[15px] bg-[#4F74C8] border-none shadow-md hover:bg-[#294586] focus:bg-[#294586] active:bg-[#294586] transition-all duration-300 ease-in-out rounded-[8px] px-4 py-2 flex items-center gap-[12px] cursor-pointer"
+                                onClick={(e) => e.stopPropagation()} // Ngăn chặn điều hướng khi click nút
+                            >
+                                <i className="fa-solid fa-square-plus text-[#ffffff] text-[20px] transition-all duration-300 ease-in-out ml-[8px]"></i>
+                                <span className="text-[#ffffff] text-lg font-[500] transition-all duration-300 ease-in-out mr-[8px]">
+                                    Add to My Anime List
+                                </span>
+                            </label>
+
                         </div>
+
+                        <input type="checkbox" id={`modal_${id}`} className="modal-toggle" />
+                        <div className="modal" role="dialog">
+                            <div className="modal-box bg-[#efecec]">
+                                <h3 className="text-lg font-bold text-black">{anime.title}</h3>
+                                
+                                <form className="mt-[20px]">
+
+                                    <div className="mb-[24px]">
+                                        <label htmlFor="status" className="block text-sm font-medium text-black">Status</label>
+                                        <select
+                                            id="status"
+                                            className="bg-transparent w-full mt-[10px] p-[6px] border border-gray-300 rounded text-gray-800"
+                                        >
+                                            <option value="watching">Watching</option>
+                                            <option value="completed">Completed</option>
+                                            <option value="dropped">Dropped</option>
+                                            <option value="onHold">On-Hold</option>
+                                            <option value="planToWatch">Plan to Watch</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="mb-[24px]">
+                                        <label htmlFor="score" className="block text-sm font-medium text-black">Your Score</label>
+                                        <select
+                                            id="score"
+                                            className="bg-transparent w-full mt-[10px] p-[6px] border border-gray-300 rounded flex flex-col items-center text-gray-800"
+                                        >
+                                            <option value="0">Select score</option>
+                                            <option value="1">(1)  Appalling</option>
+                                            <option value="2">(2)  Horrible</option>
+                                            <option value="3">(3)  Very Bad</option>
+                                            <option value="4">(4)  Bad</option>
+                                            <option value="5">(5)  Average</option>
+                                            <option value="6">(6)  Fine</option>
+                                            <option value="7">(7)  Good</option>
+                                            <option value="8">(8)  Very Good</option>
+                                            <option value="9">(9)  Great</option>
+                                            <option value="10">(10)  Masterpiece</option>
+                                        </select>
+                                    </div>
+                                    <p className="text-center text-sm mt-[32px] mb-[24px] text-gray-700">
+                                        If you haven't been able to add anime to your list yet, {" "}
+                                        <Link to="/register" className="text-gray-800 hover:text-[#000000] hover:underline">
+                                            sign up here.
+                                        </Link>
+                                    </p>
+                                    <button type="submit" className="btn bg-gray-400 text-black hover:text-[#aeaeae] border-none w-full mt-2 hover:bg-gray-700">
+                                        Add to your Anime List
+                                    </button>
+                                </form>
+                                
+                            </div>
+                            <label className="modal-backdrop text-[50px]" htmlFor={`modal_${id}`}>Đóng</label>
+                        </div>
+
                         <div className="anime-details flex flex-col justify-between" data-aos="fade-left">
                             <p className="flex gap-[16px] items-center">
                                 <span className="font-[700] text-[#454e56] text-[20px]">Aired:</span> <span className="text-black text-[18px]">{aired?.string}</span>
@@ -99,7 +167,7 @@ export const AnimeItem = () => {
                             </p>
                         </div>
                     </div>
-                    <p className="description mt-[32px] text-[#6c7983] leading-[1.7] font-[500]" data-aos="fade-up">
+                    <p className="description mt-[100px] text-[#6c7983] leading-[1.7] font-[500]" data-aos="fade-up">
                         {showMore ? synopsis : synopsis?.substring(0, 450) + '...'}
                         <button className="bg-transparent border-none outline-none cursor-pointer text-[20px] text-[#27AE60] font-[800]" onClick={() => {
                             setShowMore(!showMore);
