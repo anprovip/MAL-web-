@@ -47,6 +47,7 @@ export const AnimeItem = () => {
                             <label
                                 htmlFor={`modal_${id}`}
                                 className="p-0 absolute left-0 mt-[15px] bg-[#4F74C8] border-none shadow-md hover:bg-[#294586] focus:bg-[#294586] active:bg-[#294586] transition-all duration-300 ease-in-out rounded-[8px] px-4 py-2 flex items-center gap-[12px] cursor-pointer"
+                                data-aos="fade-down"
                                 onClick={(e) => e.stopPropagation()} // Ngăn chặn điều hướng khi click nút
                             >
                                 <i className="fa-solid fa-square-plus text-[#ffffff] text-[20px] transition-all duration-300 ease-in-out ml-[8px]"></i>

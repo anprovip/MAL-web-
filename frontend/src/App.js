@@ -7,6 +7,9 @@ import { MangaItem } from './components/MangaItem';
 import { RecommendationsAnime } from './components/RecommendationsAnime';
 import { RecommendationsManga } from './components/RecommendationsManga';
 import { Register } from './components/Register';
+import { UserProfile } from './components/UserProfile';
+import { AnimeList } from './components/AnimeList';
+import { MangaList } from './components/MangaList';
 import { useGlobalContext } from './context/global';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
@@ -25,6 +28,9 @@ function App() {
           <Route path="/recommendations/anime" element={<RecommendationsAnime />} />
           <Route path="/recommendations/manga" element={<RecommendationsManga />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile/:id" element={<UserProfile />} />
+          <Route path="/animelist/:id" element={<AnimeList />} />
+          <Route path="/mangalist/:id" element={<MangaList />} />
         </Routes>
       </BrowserRouter>
     </>

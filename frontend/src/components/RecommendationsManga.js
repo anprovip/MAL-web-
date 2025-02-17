@@ -24,7 +24,7 @@ export const RecommendationsManga = () => {
                         If you liked:
                     </div>
                     <Link 
-                        className="relative h-[500px] ml-[-300px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
+                        className="relative max-w-[370px] h-[500px] ml-[-300px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
                         to={`/manga/${manga1.mal_id}`} 
                         key={manga1.mal_id}
                     >
@@ -48,7 +48,7 @@ export const RecommendationsManga = () => {
                         ...Then you might like:
                     </div>
                     <Link 
-                        className="relative h-[500px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
+                        className="relative max-w-[370px] h-[500px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
                         to={`/manga/${manga2.mal_id}`} 
                         key={manga2.mal_id}
                     >

@@ -55,7 +55,7 @@ export const UpcomingManga = ({rendered}) => {
                                             <option value="completed">Completed</option>
                                             <option value="dropped">Dropped</option>
                                             <option value="onHold">On-Hold</option>
-                                            <option value="planToWatch">Plan to Watch</option>
+                                            <option value="planToWatch">Plan to Read</option>
                                         </select>
                                     </div>
 

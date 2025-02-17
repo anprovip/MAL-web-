@@ -24,7 +24,7 @@ export const RecommendationsAnime = () => {
                         If you liked:
                     </div>
                     <Link 
-                        className="relative h-[500px] ml-[-300px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
+                        className="relative h-[500px] max-w-[370px] ml-[-300px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
                         to={`/anime/${anime1.mal_id}`} 
                         key={anime1.mal_id}
                     >
@@ -48,7 +48,7 @@ export const RecommendationsAnime = () => {
                         ...Then you might like:
                     </div>
                     <Link 
-                        className="relative h-[500px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
+                        className="relative h-[500px] max-w-[370px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
                         to={`/anime/${anime2.mal_id}`} 
                         key={anime2.mal_id}
                     >

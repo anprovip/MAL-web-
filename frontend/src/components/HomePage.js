@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Popular } from './Popular';
 import { useGlobalContext } from '../context/global';
 import { Upcoming } from './Upcoming';
@@ -9,6 +9,7 @@ export const HomePage = () => {
     const {getUpcomingAnime, getAiringAnime, handleSubmit, search, handleChange} = useGlobalContext();
 
     const [rendered, setRendered] = useState('popular');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const switchComponent = () => {
         switch(rendered) {
@@ -29,16 +30,41 @@ export const HomePage = () => {
         navigate(`/manga`);
         
     };
+    
+    useEffect(() => {
+        if (isLoggedIn) {
+            console.log('User logged in successfully');
+        }
+    }, [isLoggedIn]);
+
     return(
         <>
             <div className="bg-[#ededed] text-black">
-                <button className="btn ml-[1690px] relative top-[20px] w-[10%] rounded-[20px] bg-gray-100 hover:bg-gray-300 text-gray-800 text-[16px]" onClick={() => document.getElementById('my_modal_2').showModal()}>
-                    Login to see more
+                {!isLoggedIn ? (
+                    <button className="btn ml-[1690px] relative top-[20px] w-[10%] rounded-[20px] bg-gray-100 hover:bg-gray-300 text-gray-800 text-[16px]" onClick={() => document.getElementById('my_modal_2').showModal()}>
+                        Login to see more
+                    </button>
+                ) : (
+                    <button
+                    className="btn ml-[1690px] relative top-[20px] w-[10%] rounded-[20px] bg-[#4F74C8] hover:bg-[#21386d] text-white text-[16px]"
+                    onClick={() => navigate('/profile/LittleBisuzz')}
+                >
+                    Go to your Profile
                 </button>
+                )
+                }
+                
                 <dialog id="my_modal_2" className="modal">
                     <div className="modal-box bg-white shadow-lg">
                         <h3 className="font-bold text-lg mb-4 text-black">Đăng nhập</h3>
-                        <form className="flex flex-col gap-4">
+                        <form 
+                            className="flex flex-col gap-4"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                setIsLoggedIn(true);
+                                document.querySelector('#my_modal_2').close();
+                            }}    
+                        >
                             <div className="form-control">
                                 <label className="label">
                                 <span className="label-text text-black font-[500]">Email</span>

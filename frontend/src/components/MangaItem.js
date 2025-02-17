@@ -54,6 +54,7 @@ export const MangaItem = () => {
                             <label
                                 htmlFor={`modal_${id}`}
                                 className="p-0 absolute left-0 mt-[15px] bg-[#4F74C8] border-none shadow-md hover:bg-[#294586] focus:bg-[#294586] active:bg-[#294586] transition-all duration-300 ease-in-out rounded-[8px] px-4 py-2 flex items-center gap-[12px] cursor-pointer"
+                                data-aos="fade-down"
                                 onClick={(e) => e.stopPropagation()} // Ngăn chặn điều hướng khi click nút
                             >
                                 <i className="fa-solid fa-square-plus text-[#ffffff] text-[20px] transition-all duration-300 ease-in-out ml-[8px]"></i>
@@ -81,7 +82,7 @@ export const MangaItem = () => {
                                             <option value="completed">Completed</option>
                                             <option value="dropped">Dropped</option>
                                             <option value="onHold">On-Hold</option>
-                                            <option value="planToWatch">Plan to Watch</option>
+                                            <option value="planToWatch">Plan to Read</option>
                                         </select>
                                     </div>
 
@@ -200,8 +201,10 @@ export const MangaItem = () => {
                                 className="flex gap-[8px] mb-[16px] items-start justify-between review py-[8px] px-[10px] rounded-[7px] bg-[#EDEDED] transition-all duration-custom ease-custom hover:scale-105"
                                 key={index}
                             >
-                                <img src={images?.jpg.image_url} alt={username} className="h-[56px] w-auto" />
-                                <h4 className="py-[8px] px-0 text-[#27AE60] text-[18px]">{username}</h4>
+                                <Link to={`/profile/${username}`}>
+                                    <img src={images?.jpg.image_url} alt={username} className="h-[56px] w-auto" />
+                                    <h4 className="py-[8px] px-0 text-[#27AE60] text-[18px]">{username}</h4>
+                                </Link>
                                 <p className="text-[#454e56] text-[14px] mt-[13px]">{new Date(date).toLocaleDateString()}</p>
                                 <p className="text-[#454e56] font-[500] p-[8px]">{review}</p>
                                 <p className="text-[#27AE60] font-[700] mt-[8px]">Score: {score}</p>
