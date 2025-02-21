@@ -13,7 +13,7 @@ export const UserProfile = () => {
         const data = await response.json();
         setUser(data.data);
     }
-
+    
     useEffect(() => {
         getUser(id);
         AOS.init({duration: 800});
@@ -21,6 +21,10 @@ export const UserProfile = () => {
     }, []);
 
     const navigate = useNavigate();
+
+    const handleLogout = () => {
+        navigate('/');    
+    };
 
     if (!user || !user.statistics || !user.statistics.anime) {
         return <span className="loading loading-bars absolute top-[50%] left-[50%] w-[64px]"></span>;
@@ -31,7 +35,7 @@ export const UserProfile = () => {
             <div className="bg-[#ffffff] min-h-screen p-[24px]">
                 <div className="text-black text-[24px] font-[600] pb-[2px] border-b-[3px] border-[#363535] mb-[64px] flex justify-between">
                     {user.username}'s Profile
-                    <button className="text-[20px] flex items-center gap-[8px] hover:text-[#f53535]">
+                    <button className="text-[20px] flex items-center gap-[8px] hover:text-[#f53535]" onClick={handleLogout}>
                         <i class="fa-solid fa-right-from-bracket"></i>
                         <p className="mb-[3px]">Logout</p>
                     </button>

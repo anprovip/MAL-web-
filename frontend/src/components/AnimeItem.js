@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom"
 import { useEffect, useState } from "react";
 import AOS from "aos";
 import 'aos/dist/aos.css';
+import { CharacterItem } from "../custom/CharacterItem";
 
 export const AnimeItem = () => {
     const {id} = useParams();
@@ -25,7 +26,7 @@ export const AnimeItem = () => {
         setCharacters(data.data);
         console.log(data.data);
     }
-
+    
     useEffect(() => {
         getAnime(id);
         getCharacters(id);
@@ -196,17 +197,9 @@ export const AnimeItem = () => {
                     Characters
                 </h3>
                 <div className="characters grid grid-cols-5 gap-[32px] bg-white p-[32px] rounded-[20px] border-[5px] border-[#e5e7eb]" data-aos="fade-up" data-aos-delay="500">
-                    {characters?.map((character, index) => {
-                        const {role} = character;
-                        const {images, name, mal_id} = character.character;
-                        return <Link to={`/character/${mal_id}`} state={{from: '/'}} key={index}>
-                            <div className="character py-[8px] px-[10px] rounded-[7px] bg-[#EDEDED] transition-all duration-custom ease-custom hover:scale-105">
-                                <img src={images?.jpg.image_url} alt="" className="w-full"/>
-                                <h4 className="py-[8px] px-0 text-[#454e56]">{name}</h4>
-                                <p className="text-[#27AE60]">{role}</p>
-                            </div>
-                        </Link>
-                    })}
+                    {characters?.map((character, index) => (
+                        <CharacterItem key={index} character={character} />
+                    ))}
                 </div>
             </div>
         </>

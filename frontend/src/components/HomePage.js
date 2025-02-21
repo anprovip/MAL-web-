@@ -4,12 +4,14 @@ import { useGlobalContext } from '../context/global';
 import { Upcoming } from './Upcoming';
 import { Airing } from './Airing';
 import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 export const HomePage = () => {
     const {getUpcomingAnime, getAiringAnime, handleSubmit, search, handleChange} = useGlobalContext();
 
     const [rendered, setRendered] = useState('popular');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [username, setUsername] = useState('');
 
     const switchComponent = () => {
         switch(rendered) {
@@ -31,11 +33,62 @@ export const HomePage = () => {
         
     };
     
+    // const handleLogin = async (event) => {
+    //     event.preventDefault();
+    //     const email = event.target.email.value;
+    //     const password = event.target.password.value;
+
+    //     try {
+    //         const response = await fetch('http://localhost:8000/login', {
+    //             method: 'POST',
+    //             headers: { 'Content-Type': 'application/json' },
+    //             body: JSON.stringify({ email, password }),
+    //         });
+
+    //         if (!response.ok) {
+    //             alert('Sai email hoặc mật khẩu');
+    //             return;
+    //         }
+
+    //         const data = await response.json();
+    //         localStorage.setItem('token', data.access_token);
+    //         localStorage.setItem('username', data.username);
+
+    //         setUsername(data.username);
+    //         setIsLoggedIn(true);
+    //         document.getElementById('my_modal_2').close();
+    //     } catch (error) {
+    //         console.error('Lỗi đăng nhập:', error);
+    //     }
+    // };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You are going to log out!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, I'm logging out!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setIsLoggedIn(false);
+                setUsername('');
+            }
+        });
+    };
+
     useEffect(() => {
-        if (isLoggedIn) {
-            console.log('User logged in successfully');
+        const token = localStorage.getItem('token');
+        const storedUsername = localStorage.getItem('username');
+        if (token && storedUsername) {
+            setIsLoggedIn(true);
+            setUsername(storedUsername);
         }
-    }, [isLoggedIn]);
+    }, []);
 
     return(
         <>
@@ -45,15 +98,22 @@ export const HomePage = () => {
                         Login to see more
                     </button>
                 ) : (
-                    <button
-                    className="btn ml-[1690px] relative top-[20px] w-[10%] rounded-[20px] bg-[#4F74C8] hover:bg-[#21386d] text-white text-[16px]"
-                    onClick={() => navigate('/profile/LittleBisuzz')}
-                >
-                    Go to your Profile
-                </button>
-                )
-                }
-                
+                    <div className="flex justify-end gap-[16px] pt-[20px] pr-[16px]">
+                        <button
+                            className="btn rounded-[20px] bg-[#4F74C8] hover:bg-[#21386d] text-white text-[16px]"
+                            onClick={() => navigate('/profile/LittleBisuzz')}
+                        >
+                            Go to your Profile
+                        </button>
+                        <button 
+                            className="btn bg-red-500 hover:bg-red-700 text-white rounded-[20px] text-[16px]"
+                            onClick={handleLogout}
+                        >
+                            Logout
+                        </button>
+                    </div>
+                      
+                )}
                 <dialog id="my_modal_2" className="modal">
                     <div className="modal-box bg-white shadow-lg">
                         <h3 className="font-bold text-lg mb-4 text-black">Đăng nhập</h3>
