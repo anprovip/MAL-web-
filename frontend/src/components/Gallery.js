@@ -27,7 +27,7 @@ export const Gallery = () => {
                         Back to {fromPage === "/manga" ? "Manga Home" : "Anime Home"}
                     </Link>
                 </div>
-                <div className="big-image inline-block p-[32px] my-[32px] mx-0 bg-[#fff] border-[5px] border-[#e5e7eb] rounded-[7px] relative">
+                <div className="big-image inline-block p-[32px] my-[64px] mx-0 bg-[#fff] border-[5px] border-[#e5e7eb] rounded-[7px] relative">
                     <img src={pictures[index]?.jpg.image_url} alt="" className="w-[350px]"/>
                 </div>
                 <div className="small-images flex flex-wrap gap-[8px] w-[80%] p-[32px] bg-[#fff] border-[5px] border-[#e5e7eb] rounded-[7px]">

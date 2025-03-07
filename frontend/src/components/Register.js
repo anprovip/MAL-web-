@@ -19,7 +19,7 @@ export const Register = () => {
         <div className="bg-[#fff] w-full h-[100vh] bg-opacity-50">
             <div data-aos="zoom-in"
                 data-aos-easing="ease-out-cubic"
-                className="w-[600px] mx-auto relative top-[64px] bg-[#FFFFFF] text-black p-[32px] rounded-[10px] shadow-all-around shadow-[#E5E7EB]"
+                className="w-[500px] sm:w-[560px] md:w-[600px] mx-auto relative top-[64px] bg-[#FFFFFF] text-black p-[32px] rounded-[10px] shadow-all-around shadow-[#E5E7EB]"
             >
                 <h3 className="font-bold leading-[28px] text-[20px] mb-4 text-black">Đăng ký</h3>
                 <form className="flex flex-col gap-4">
@@ -97,7 +97,7 @@ export const Register = () => {
 
                     <p className="text-center text-sm mt-6 mb-4 text-gray-600">
                         Chuyển hướng đến trang chủ? {" "}
-                        <Link to="/" className="text-gray-700 hover:text-[#0e1216] hover:underline">
+                        <Link to="/" className="text-gray-600 font-[700] hover:text-[#0e1216] hover:underline">
                             Đồng ý
                         </Link>
                     </p>
