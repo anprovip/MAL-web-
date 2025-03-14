@@ -33,38 +33,54 @@ export const HomePage = () => {
         
     };
     
-    // const handleLogin = async (event) => {
-    //     event.preventDefault();
-    //     const email = event.target.email.value;
-    //     const password = event.target.password.value;
-
-    //     try {
-    //         const response = await fetch('http://localhost:8000/login', {
-    //             method: 'POST',
-    //             headers: { 'Content-Type': 'application/json' },
-    //             body: JSON.stringify({ email, password }),
-    //         });
-
-    //         if (!response.ok) {
-    //             alert('Sai email hoặc mật khẩu');
-    //             return;
-    //         }
-
-    //         const data = await response.json();
-    //         localStorage.setItem('token', data.access_token);
-    //         localStorage.setItem('username', data.username);
-
-    //         setUsername(data.username);
-    //         setIsLoggedIn(true);
-    //         document.getElementById('my_modal_2').close();
-    //     } catch (error) {
-    //         console.error('Lỗi đăng nhập:', error);
-    //     }
-    // };
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        const email = event.target.email.value;
+        const password = event.target.password.value;
+        console.log("Đang gửi login request với:", { email, password });
+    
+        try {
+            // Tạo FormData
+            const formData = new FormData();
+            formData.append("username", email); // Gửi email dưới dạng username
+            formData.append("password", password);
+    
+            const response = await fetch("http://127.0.0.1:8000/login", {
+                method: "POST",
+                body: formData, // Gửi dưới dạng form-data, không cần header Content-Type
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.log("Error từ backend:", errorData);
+                let errorMessage = "Đăng nhập thất bại!";
+                if (errorData.detail) {
+                    if (typeof errorData.detail === "string") {
+                        errorMessage = errorData.detail;
+                    } else if (Array.isArray(errorData.detail)) {
+                        errorMessage = errorData.detail
+                            .map((err) => (err.msg ? err.msg : JSON.stringify(err)))
+                            .join(", ");
+                    } else if (typeof errorData.detail === "object") {
+                        errorMessage = JSON.stringify(errorData.detail);
+                    }
+                }
+                throw new Error(errorMessage);
+            }
+    
+            const data = await response.json();
+            console.log("ĐÂY LÀ TOKEN: ", data.access_token);
+            localStorage.setItem("token", data.access_token);
+            localStorage.setItem("username", data.username);
+            setUsername(data.username);
+            setIsLoggedIn(true);
+            document.getElementById("my_modal_2").close();
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('username');
         Swal.fire({
             title: "Are you sure?",
             text: "You are going to log out!",
@@ -75,6 +91,8 @@ export const HomePage = () => {
             confirmButtonText: "Yes, I'm logging out!"
         }).then((result) => {
             if (result.isConfirmed) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
                 setIsLoggedIn(false);
                 setUsername('');
             }
@@ -124,11 +142,7 @@ export const HomePage = () => {
                         <h3 className="font-bold text-lg sm:text-xl mb-4 text-black">Đăng nhập</h3>
                         <form
                             className="flex flex-col gap-4"
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                setIsLoggedIn(true);
-                                document.querySelector('#my_modal_2').close();
-                            }}
+                            onSubmit={handleLogin}
                         >
                             <div className="form-control">
                                 <label className="label">
@@ -136,6 +150,7 @@ export const HomePage = () => {
                                 </label>
                                 <input
                                     type="email"
+                                    name="email" // Thêm name để event.target.email.value hoạt động
                                     placeholder="Nhập email của bạn"
                                     className="input input-bordered w-full bg-gray-50 border-gray-200 text-gray-700 focus:border-gray-400 focus:bg-white text-sm sm:text-base"
                                     required
@@ -147,6 +162,7 @@ export const HomePage = () => {
                                 </label>
                                 <input
                                     type="password"
+                                    name="password" // Thêm name để event.target.password.value hoạt động
                                     placeholder="Nhập mật khẩu"
                                     className="input input-bordered w-full bg-gray-50 border-gray-200 text-gray-700 focus:border-gray-400 focus:bg-white text-sm sm:text-base"
                                     required
