@@ -7,16 +7,26 @@ import { CharacterItem } from "../custom/CharacterItem";
 export const AnimeItem = () => {
     const {id} = useParams();
     const [anime, setAnime] = useState({});
+    const [animePrevent, setAnimePrevent] = useState({});
     const [characters, setCharacters] = useState([]);
     const [showMore, setShowMore] = useState(false);
 
-    const {title, episodes, synopsis, trailer, duration, aired, season, images, rank, score, scored_by, popularity, status, rating, genres, producers} = anime;
-
+    const {title, episodes, synopsis, duration, aired_from, aired_to, season, large_image_url, rank, score, scored_by, popularity, status, rating, genres, producers} = anime;
+    const {trailer} = animePrevent;
     // Get anime by id
     const getAnime = async (anime) => {
+        // const response = await fetch(`https://api.jikan.moe/v4/anime/${anime}`);
+        const response = await fetch(`http://127.0.0.1:8000/animes/${anime}`);
+        const data = await response.json();
+        setAnime(data);
+        
+    }
+
+    const getAnimePrevent = async (anime) => {
         const response = await fetch(`https://api.jikan.moe/v4/anime/${anime}`);
         const data = await response.json();
-        setAnime(data.data);
+        setAnimePrevent(data.data);
+        
     }
 
     // get characters
@@ -26,9 +36,25 @@ export const AnimeItem = () => {
         setCharacters(data.data);
         console.log(data.data);
     }
+
+    function formatAiredDate(start, end) {
+        const options = { year: "numeric", month: "short", day: "numeric" };
+        
+        const startDate = new Date(start).toLocaleString("en-US", options);
+        const endDate = new Date(end).toLocaleString("en-US", options);
+        
+        return `${startDate} to ${endDate}`;
+    }
+    
+    // Ví dụ
+    const start = "2002-10-03T00:00:00";
+    const end = "2007-02-08T00:00:00";
+    
+    console.log(formatAiredDate(start, end));
     
     useEffect(() => {
         getAnime(id);
+        getAnimePrevent(id);
         getCharacters(id);
         AOS.init({duration: 800});
         window.scrollTo(0, 0);
@@ -45,7 +71,7 @@ export const AnimeItem = () => {
                         <div className="image relative" data-aos="fade-down">
                             {/* Added max width to limit image size on 2xl screens */}
                             <div className="w-full md:max-w-full lg:max-w-[90%] xl:max-w-[80%] 2xl:max-w-[70%] mx-auto">
-                                <img src={images?.jpg.large_image_url} alt="" className="rounded-[7px] w-full"/>
+                                <img src={large_image_url} alt="" className="rounded-[7px] w-full"/>
                             </div>
                             
                             {/* Added positioning improvements for the button */}
@@ -119,7 +145,7 @@ export const AnimeItem = () => {
 
                         <div className="anime-details flex flex-col justify-between gap-2 md:gap-1" data-aos="fade-left">
                             <p className="flex gap-[8px] sm:gap-[12px] md:gap-[16px] items-center">
-                                <span className="font-[700] text-[#454e56] text-[16px] sm:text-[18px] md:text-[20px]">Aired:</span> <span className="text-black text-[14px] sm:text-[16px] md:text-[18px]">{aired?.string}</span>
+                                <span className="font-[700] mt-[0px] text-[#454e56] text-[16px] sm:text-[18px] md:text-[20px]">Aired:</span> <span className="text-black text-[14px] mb-[1px] sm:text-[16px] md:text-[18px]">{formatAiredDate(aired_from, aired_to)}</span>
                             </p>
                             <p className="flex gap-[8px] sm:gap-[12px] md:gap-[16px] items-center">
                                 <span className="font-[700] text-[#454e56] text-[16px] sm:text-[18px] md:text-[20px]">Rating: </span> <span className="text-black text-[14px] sm:text-[16px] md:text-[18px]">{rating}</span>
