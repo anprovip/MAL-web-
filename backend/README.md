@@ -11,8 +11,11 @@
    ```sh
    docker compose up -d
    ```
-
 2. **Run the FastAPI application:**
+   ```sh
+   pip install -r requirements.txt
+   ```
+3. **Run the FastAPI application:**
    ```sh
    uvicorn app.main:app --reload
    ```
