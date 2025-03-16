@@ -1,36 +1,39 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, conint
 from datetime import datetime
 from typing import Optional
 
 class UserCreate(BaseModel):
+    username: str
     email: EmailStr
     password: str
-
     class Config:
         orm_mode = True
 
 class UserOut(BaseModel):
-    id: int 
+    user_id: int 
     email: EmailStr
-    
+    username: str
+    password:str
+    user_watching: int
+    user_completed: int
+    user_onhold: int
+    user_dropped: int
+    user_plantowatch:int
     class Config:
         orm_mode = True
 
-class PostBase(BaseModel):
-    title: str
-    content: str
-    published: bool = True
+class AnimeBase(BaseModel):
+    anime_name: str
 
-class PostCreate(PostBase):
+class AnimeCreate(AnimeBase):
     pass
 
-class PostUpdate(PostBase):
+class  AnimeUpdate(AnimeBase):
     pass
 
-class Post(PostBase):
-    id: int
-    created_at: datetime
-    owner_id: int
+class Anime(AnimeBase):
+    anime_id: int
+    user_id: int
 
     class Config:
         orm_mode = True
@@ -46,4 +49,14 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    id: Optional[str] = None
+    user_id: Optional[str] = None
+class Rating(BaseModel):
+    anime_id: int
+    my_score:int
+    my_status:int
+    class Config:
+        orm_mode = True
+class RatingDelete(BaseModel):
+    anime_id: int
+    class Config:
+        orm_mode = True
