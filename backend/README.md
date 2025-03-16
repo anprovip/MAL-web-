@@ -15,7 +15,18 @@
    ```sh
    pip install -r requirements.txt
    ```
-3. **Run the FastAPI application:**
+3. **Create a virtual environment**
+   ```sh
+   python3 -m venv .venv
+   ```
+   *Activate a virtual environment*
+   ```sh
+   # In cmd.exe
+   venv\Scripts\activate.bat
+   # In PowerShell
+   venv\Scripts\Activate.ps1
+   ```
+5. **Run the FastAPI application:**
    ```sh
    uvicorn app.main:app --reload
    ```
