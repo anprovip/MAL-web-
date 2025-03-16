@@ -7,7 +7,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class UserOut(BaseModel):
     user_id: int 
@@ -20,7 +20,7 @@ class UserOut(BaseModel):
     user_dropped: int
     user_plantowatch:int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class AnimeBase(BaseModel):
     anime_name: str
@@ -36,7 +36,7 @@ class Anime(AnimeBase):
     user_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserLogin(BaseModel):
@@ -51,16 +51,6 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     user_id: Optional[str] = None
 
-class Rating(BaseModel):
-    anime_id: int
-    my_score:int
-    my_status:int
-    class Config:
-        orm_mode = True
-class RatingDelete(BaseModel):
-    anime_id: int
-    class Config:
-        orm_mode = True
 
 # Schema cho Genre
 class GenreBase(BaseModel):
@@ -75,7 +65,7 @@ class GenreResponse(GenreBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema cho Theme
@@ -91,7 +81,7 @@ class ThemeResponse(ThemeBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema cho Demographic
@@ -107,7 +97,7 @@ class DemographicResponse(DemographicBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema cho Producer
@@ -123,7 +113,7 @@ class ProducerResponse(ProducerBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema cho Licensor
@@ -139,7 +129,7 @@ class LicensorResponse(LicensorBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema cho Studio
@@ -155,7 +145,7 @@ class StudioResponse(StudioBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schema cho Anime
@@ -254,7 +244,7 @@ class AnimeResponse(AnimeBase):
     studios: List[StudioResponse] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # Schemas cho pagination
@@ -264,3 +254,15 @@ class PaginatedResponse(BaseModel):
     page: int
     size: int
     pages: int
+
+class Rating(BaseModel):
+    anime_id: int
+    my_score:int
+    my_status:int
+    class Config:
+        from_attributes = True
+
+class RatingDelete(BaseModel):
+    anime_id: int
+    class Config:
+        from_attributes = True
