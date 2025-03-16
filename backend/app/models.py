@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Float, Text, DateTime
+
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Table, Float, Text, DateTime, CheckConstraint
+
 from sqlalchemy.sql.expression import text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.sqltypes import TIMESTAMP
-
 from .database import Base
 
 class Post(Base):
@@ -13,14 +14,30 @@ class Post(Base):
     content =Column(String, nullable=False)
     published = Column(Boolean, server_default='TRUE', nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
-    owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, primary_key=True, nullable=False)
+    username = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
+
+    user_watching = Column(Integer, nullable=True, server_default=text('0'))
+    user_completed = Column(Integer, nullable=True, server_default=text('0'))
+    user_onhold = Column(Integer, nullable=True, server_default=text('0'))
+    user_dropped = Column(Integer, nullable=True, server_default=text('0'))
+    user_plantowatch = Column(Integer, nullable=True, server_default=text('0'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+
+class Rating(Base):
+    __tablename__ = "ratings"
+    rating_id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    anime_id = Column(Integer, ForeignKey("animes.mal_id", ondelete="CASCADE"), nullable=False)
+    my_score = Column(Integer, CheckConstraint("my_score BETWEEN 1 AND 10"), nullable=False)
+    my_status = Column(Integer, CheckConstraint("my_status IN (1, 2, 3, 4, 6)"), nullable=False)
+    create_at=  Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
 # Bảng liên kết anime_genres
 anime_genres = Table(
