@@ -45,7 +45,7 @@ def get_animes(
     
     # Return paginated response
     return {
-        "data": animes,
+        "items": animes,
         "total": total,
         "page": page,
         "size": size,
@@ -61,7 +61,7 @@ def get_anime(anime_id: int = Path(..., description="MAL ID of the anime to get"
     if not db_anime:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                             detail=f"Anime with id: {anime_id} was not found")
-    return {"data": db_anime}
+    return db_anime
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.AnimeResponse)
@@ -95,7 +95,7 @@ def update_anime(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
                           detail=f"Anime with id: {anime_id} does not exist")
     
-    return {"data": db_anime}
+    return db_anime
 
 
 @router.delete("/{anime_id}", status_code=status.HTTP_204_NO_CONTENT)
