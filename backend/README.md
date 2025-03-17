@@ -11,11 +11,7 @@
    ```sh
    docker compose up -d
    ```
-2. **Run the FastAPI application:**
-   ```sh
-   pip install -r requirements.txt
-   ```
-3. **Create a virtual environment**
+2. **Create a virtual environment**
    ```sh
    python3 -m venv .venv
    ```
@@ -25,6 +21,10 @@
    venv\Scripts\activate.bat
    # In PowerShell
    venv\Scripts\Activate.ps1
+   ```
+3. **Run the FastAPI application:**
+   ```sh
+   pip install -r requirements.txt
    ```
 5. **Run the FastAPI application:**
    ```sh

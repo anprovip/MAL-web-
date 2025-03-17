@@ -32,7 +32,7 @@ class  AnimeUpdate(AnimeBase):
     pass
 
 class Anime(AnimeBase):
-    anime_id: int
+    mal_id: int
     user_id: int
 
     class Config:
@@ -256,13 +256,13 @@ class PaginatedResponse(BaseModel):
     pages: int
 
 class Rating(BaseModel):
-    anime_id: int
+    mal_id: int
     my_score:int
     my_status:int
     class Config:
         from_attributes = True
 
 class RatingDelete(BaseModel):
-    anime_id: int
+    mal_id: int
     class Config:
         from_attributes = True
