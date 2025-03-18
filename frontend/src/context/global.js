@@ -161,30 +161,32 @@ export const GlobalContextProvider = ({ children }) => {
 
     const getPopularAnime = async () => {
         dispatch({ type: LOADING });
-        const response = await fetch(`${baseUrl}/top/anime?filter=bypopularity`);
+        // const response = await fetch(`${baseUrl}/top/anime?filter=bypopularity`);
+        const response = await fetch(`http://127.0.0.1:8000/animes/?page=1&size=24&sort_by=popularity`);
         const data = await response.json();
-        dispatch({ type: GET_POPULAR_ANIME, payload: data.data });
+        dispatch({ type: GET_POPULAR_ANIME, payload: data.items });
     }
 
     const getUpcomingAnime = async () => {
         dispatch({ type: LOADING });
-        const response = await fetch(`${baseUrl}/top/anime?filter=upcoming`);
+        const response = await fetch(`http://127.0.0.1:8000/animes/?page=1&size=100&sort_by=rank`);
         const data = await response.json();
-        dispatch({ type: GET_UPCOMING_ANIME, payload: data.data });
+        dispatch({ type: GET_UPCOMING_ANIME, payload: data.items });
     }
 
     const getAiringAnime = async () => {
         dispatch({ type: LOADING });
-        const response = await fetch(`${baseUrl}/top/anime?filter=airing`);
+        const response = await fetch(`http://127.0.0.1:8000/animes/?page=1&size=24&min_score=7&sort_by=airing`);
         const data = await response.json();
-        dispatch({ type: GET_AIRING_ANIME, payload: data.data });
+        dispatch({ type: GET_AIRING_ANIME, payload: data.items });
     }
 
     const getTopAnime = async () => {
         dispatch({ type: LOADING });
-        const response = await fetch(`${baseUrl}/top/anime`);
+        // const response = await fetch(`${baseUrl}/top/anime`);
+        const response = await fetch(`http://127.0.0.1:8000/animes/?page=1&size=20&sort_by=rank`);
         const data = await response.json();
-        dispatch({ type: GET_TOP_ANIME, payload: data.data });
+        dispatch({ type: GET_TOP_ANIME, payload: data.items });
     }
 
     const getTopManga = async () => {

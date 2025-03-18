@@ -29,7 +29,7 @@ function App() {
           <Route path="/recommendations/manga" element={<RecommendationsManga />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile/:id" element={<UserProfile />} />
-          <Route path="/animelist/:id" element={<AnimeList />} />
+          <Route path="/animelist/:username" element={<AnimeList />} />
           <Route path="/mangalist/:id" element={<MangaList />} />
         </Routes>
       </BrowserRouter>

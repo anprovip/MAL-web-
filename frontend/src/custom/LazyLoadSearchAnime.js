@@ -1,82 +1,22 @@
-import { useState } from "react"; // Thêm useState để quản lý form
 import { Link, useNavigate } from "react-router-dom";
 import { useCharacterInView } from "./useCharacterInView";
-import Swal from "sweetalert2";
 
-export const LazyLoadAnime = ({ anime }) => {
+export const LazyLoadSearchAnime = ({ anime }) => {
     const { ref, inView } = useCharacterInView();
     const navigate = useNavigate();
-    const [status, setStatus] = useState(""); // State để lưu giá trị status
-    const [score, setScore] = useState(""); // State để lưu giá trị score
-
-    // Mapping status từ text sang số để gửi API
-    const statusMap = {
-        watching: 1,
-        completed: 2,
-        onHold: 3,
-        dropped: 4,
-        planToWatch: 5,
-    };
-
-    // Hàm xử lý submit form
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        const token = localStorage.getItem("token");
-        if (!token) {
-            Swal.fire("Error!", "Please log in to add anime to your list!", "error");
-            return;
-        }
-
-        if (!status || !score || score === "0") {
-            Swal.fire("Error!", "Please select both status and score!", "error");
-            return;
-        }
-
-        const ratingData = {
-            mal_id: anime.mal_id,
-            my_status: statusMap[status], // Chuyển đổi status từ text sang số
-            my_score: parseInt(score), // Chuyển score thành số nguyên
-        };
-
-        try {
-            const response = await fetch("http://127.0.0.1:8000/rating/", {
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(ratingData),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Lỗi: ${response.status} - ${response.statusText}`);
-            }
-
-            Swal.fire("Success!", `${anime.title} has been added to your list!`, "success");
-            // Reset form sau khi thành công
-            setStatus("");
-            setScore("");
-            document.getElementById(`modal_${anime.mal_id}`).checked = false; // Đóng modal
-        } catch (error) {
-            console.error("Lỗi khi thêm anime vào danh sách:", error.message);
-            Swal.fire("Error!", "Failed to add anime to your list.", "error");
-        }
-    };
 
     return (
-        <div
+        <div 
             ref={ref}
             className="relative h-[600px] sm:h-[450px] md:h-[480px] lg:h-[500px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
         >
             {inView ? (
                 <>
                     <Link to={`/anime/${anime.mal_id}`}>
-                        <img
-                            className="w-full h-full object-cover rounded-[5px]"
-                            src={anime.large_image_url}
-                            alt=""
+                        <img 
+                            className="w-full h-full object-cover rounded-[5px]" 
+                            src={anime.images.jpg.large_image_url} 
+                            alt="" 
                         />
                         <div className="text-center font-[600] text-[20px] sm:text-[16px] md:text-[18px] mt-[8px] mx-[4px] line-clamp-2">
                             {anime.title}
@@ -88,9 +28,7 @@ export const LazyLoadAnime = ({ anime }) => {
                         onClick={() => navigate(`/anime/${anime.mal_id}`)}
                     >
                         <div className="text-white">
-                            <h3 className="text-[28px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-[700]">
-                                {anime.title}
-                            </h3>
+                            <h3 className="text-[28px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-[700]">{anime.title}</h3>
                             <p className="mt-[24px] mb-[64px] sm:mt-[8px] sm:mb-[24px] md:mb-[32px]">
                                 {anime.score} <i className="text-[#F3DF4C] fa-solid fa-star"></i>
                             </p>
@@ -112,21 +50,14 @@ export const LazyLoadAnime = ({ anime }) => {
                     <div className="modal" role="dialog">
                         <div className="modal-box bg-[#efecec] w-[90%] max-w-[500px]">
                             <h3 className="text-lg font-bold text-black">{anime.title}</h3>
-
-                            <form className="mt-[20px]" onSubmit={handleSubmit}>
+                            
+                            <form className="mt-[20px]">
                                 <div className="mb-[24px]">
-                                    <label htmlFor="status" className="block text-sm font-medium text-black">
-                                        Status
-                                    </label>
+                                    <label htmlFor="status" className="block text-sm font-medium text-black">Status</label>
                                     <select
                                         id="status"
-                                        value={status}
-                                        onChange={(e) => setStatus(e.target.value)}
                                         className="bg-transparent w-full mt-[10px] p-[6px] border border-gray-300 rounded text-gray-800"
                                     >
-                                        <option value="" disabled>
-                                            Select status
-                                        </option>
                                         <option value="watching">Watching</option>
                                         <option value="completed">Completed</option>
                                         <option value="dropped">Dropped</option>
@@ -136,13 +67,9 @@ export const LazyLoadAnime = ({ anime }) => {
                                 </div>
 
                                 <div className="mb-[24px]">
-                                    <label htmlFor="score" className="block text-sm font-medium text-black">
-                                        Your Score
-                                    </label>
+                                    <label htmlFor="score" className="block text-sm font-medium text-black">Your Score</label>
                                     <select
                                         id="score"
-                                        value={score}
-                                        onChange={(e) => setScore(e.target.value)}
                                         className="bg-transparent w-full mt-[10px] p-[6px] border border-gray-300 rounded text-gray-800"
                                     >
                                         <option value="0">Select score</option>
@@ -159,25 +86,17 @@ export const LazyLoadAnime = ({ anime }) => {
                                     </select>
                                 </div>
                                 <p className="text-center text-sm mt-[32px] mb-[24px] text-gray-700">
-                                    If you haven't been able to add anime to your list yet,{" "}
-                                    <Link
-                                        to="/register"
-                                        className="text-gray-800 hover:text-[#000000] hover:underline"
-                                    >
+                                    If you haven't been able to add anime to your list yet, {" "}
+                                    <Link to="/register" className="text-gray-800 hover:text-[#000000] hover:underline">
                                         sign up here.
                                     </Link>
                                 </p>
-                                <button
-                                    type="submit"
-                                    className="btn bg-gray-400 text-black hover:text-[#aeaeae] border-none w-full mt-2 hover:bg-gray-700"
-                                >
+                                <button type="submit" className="btn bg-gray-400 text-black hover:text-[#aeaeae] border-none w-full mt-2 hover:bg-gray-700">
                                     Add to your Anime List
                                 </button>
                             </form>
                         </div>
-                        <label className="modal-backdrop" htmlFor={`modal_${anime.mal_id}`}>
-                            Close
-                        </label>
+                        <label className="modal-backdrop" htmlFor={`modal_${anime.mal_id}`}>Close</label>
                     </div>
                 </>
             ) : (

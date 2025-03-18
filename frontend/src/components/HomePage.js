@@ -35,14 +35,14 @@ export const HomePage = () => {
     
     const handleLogin = async (event) => {
         event.preventDefault();
-        const email = event.target.email.value;
+        const username = event.target.username.value;
         const password = event.target.password.value;
-        console.log("Đang gửi login request với:", { email, password });
+        console.log("Đang gửi login request với:", { username, password });
     
         try {
             // Tạo FormData
             const formData = new FormData();
-            formData.append("username", email); // Gửi email dưới dạng username
+            formData.append("username", username); // Gửi username
             formData.append("password", password);
     
             const response = await fetch("http://127.0.0.1:8000/login", {
@@ -71,8 +71,9 @@ export const HomePage = () => {
             const data = await response.json();
             console.log("ĐÂY LÀ TOKEN: ", data.access_token);
             localStorage.setItem("token", data.access_token);
-            localStorage.setItem("username", data.username);
-            setUsername(data.username);
+            localStorage.setItem("username", username);
+            console.log("ĐÂY LÀ USERNAME:", username);
+            setUsername(username);
             setIsLoggedIn(true);
             document.getElementById("my_modal_2").close();
         } catch (error) {
@@ -105,6 +106,7 @@ export const HomePage = () => {
         if (token && storedUsername) {
             setIsLoggedIn(true);
             setUsername(storedUsername);
+            
         }
     }, []);
 
@@ -123,9 +125,9 @@ export const HomePage = () => {
                     <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 pt-4 pr-4">
                         <button
                             className="btn rounded-[20px] bg-[#4F74C8] hover:bg-[#21386d] text-white text-sm sm:text-base lg:text-lg px-2 sm:px-4"
-                            onClick={() => navigate('/profile/LittleBisuzz')}
+                            onClick={() => navigate(`/profile/${username}`)}
                         >
-                            Go to your Profile
+                            Go to your Profile, {username}
                         </button>
                         <button
                             className="btn bg-red-500 hover:bg-red-700 text-white rounded-[20px] text-sm sm:text-base lg:text-lg px-2 sm:px-4"
@@ -146,11 +148,11 @@ export const HomePage = () => {
                         >
                             <div className="form-control">
                                 <label className="label">
-                                    <span className="label-text text-black font-[500] text-sm sm:text-base">Email</span>
+                                    <span className="label-text text-black font-[500] text-sm sm:text-base">Username</span>
                                 </label>
                                 <input
-                                    type="email"
-                                    name="email" // Thêm name để event.target.email.value hoạt động
+                                    type="text"
+                                    name="username" // Thêm name để event.target.email.value hoạt động
                                     placeholder="Nhập email của bạn"
                                     className="input input-bordered w-full bg-gray-50 border-gray-200 text-gray-700 focus:border-gray-400 focus:bg-white text-sm sm:text-base"
                                     required
@@ -188,7 +190,7 @@ export const HomePage = () => {
                 <header className="py-4 sm:py-6 md:py-8 px-4 sm:px-8 md:px-12 lg:px-20 w-full sm:w-[90%] mx-auto transition-all duration-custom ease-custom">
                     <div className="logo flex items-center justify-center mb-4 sm:mb-6 md:mb-8">
                         <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-[700] text-center">
-                            {rendered === 'popular' ? 'Popular Anime' : rendered === 'airing' ? 'Airing Anime' : 'Upcoming Anime'}
+                            {rendered === 'popular' ? 'Popular Anime' : rendered === 'airing' ? 'Airing Anime' : 'Top 100 Anime of All Times'}
                         </h1>
                     </div>
 
@@ -233,7 +235,7 @@ export const HomePage = () => {
                                 getUpcomingAnime();
                             }}
                         >
-                            Upcoming
+                            Top 100 of All Times
                         </button>
                         <button
                             className="w-full sm:w-auto py-2 px-4 sm:py-3 sm:px-6 font-[500] rounded-[30px] text-sm sm:text-base md:text-lg bg-[#fff] border-[3px] border-[#2A3441] hover:bg-[#e5e7eb] transition-all duration-custom ease-custom"

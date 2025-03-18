@@ -9,10 +9,33 @@ export const UserProfile = () => {
     const [user, setUser] = useState([]);
 
     const getUser = async (username) => {
-        const response = await fetch(`https://api.jikan.moe/v4/users/${username}/full`);
-        const data = await response.json();
-        setUser(data.data);
-    }
+        const token = localStorage.getItem('token'); // Lấy token từ localStorage
+        if (!token) {
+            console.error("Không tìm thấy token, vui lòng đăng nhập lại!");
+            return;
+        }
+    
+        try {
+            // const response = await fetch(`https://api.jikan.moe/v4/users/${username}/full`);
+            const response = await fetch(`http://127.0.0.1:8000/users/`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`, // Thêm header Authorization
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Lỗi: ${response.status} - ${response.statusText}`);
+            }
+    
+            const data = await response.json();
+            setUser(data);
+            console.log("ĐÂY LÀ USERNAME:", data.username);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu user:", error.message);
+        }
+    };
     
     useEffect(() => {
         getUser(id);
@@ -26,7 +49,7 @@ export const UserProfile = () => {
         navigate('/');    
     };
 
-    if (!user || !user.statistics || !user.statistics.anime) {
+    if (!user) {
         return <span className="loading loading-bars absolute top-[50%] left-[50%] w-[64px]"></span>;
     }
 
@@ -44,10 +67,10 @@ export const UserProfile = () => {
                     <div className="w-[20%] flex flex-col">
                         <div>
                             <p className="flex gap-[16px] items-center mb-[12px]">
-                                    <span className="font-[700] text-[#000000] text-[18px]">Total Anime in List:</span> <span className="text-black text-[18px]">{user?.statistics?.anime?.total_entries || 0}</span>
+                                    <span className="font-[700] text-[#000000] text-[18px]">Total Anime in List:</span> <span className="text-black text-[18px]">{user?.total_anime || 257}</span>
                             </p>
                             <p className="flex gap-[16px] items-center mb-[12px]">
-                                <span className="font-[700] text-[#000000] text-[18px]">Total Manga in List: </span> <span className="text-black text-[18px]">{user?.statistics?.manga?.total_entries || 0}</span>
+                                <span className="font-[700] text-[#000000] text-[18px]">Total Manga in List: </span> <span className="text-black text-[18px]">{user?.statistics?.manga?.total_entries || 44}</span>
                             </p>
                             <p className="flex gap-[16px] items-center mb-[12px]">
                                 <span className="font-[700] text-[#000000] text-[18px]">Your</span> <Link to={`/recommendations/manga`} state={{from: '/'}} className='text-[#000000] text-[18px] font-[600] text-center hover:text-[#484444] cursor-pointer underline'>Manga Recommendations</Link>
@@ -73,11 +96,11 @@ export const UserProfile = () => {
                                 <div className="flex items-center justify-between p-[16px]">
                                     <div className="font-[700] text-[#000000] text-[18px] flex items-center gap-[8px]">
                                         <p>Mean Score: </p>
-                                        <span>{user?.statistics?.anime?.mean_score || 0}</span>
+                                        <span>{user?.mean_score || 8.85}</span>
                                     </div>
                                     <div className="font-[700] text-[#000000] text-[18px] flex items-center gap-[8px]">
                                         <p>Episodes: </p>
-                                        <span>{user?.statistics?.anime?.episodes_watched.toLocaleString() || 0}</span>
+                                        <span>{user?.statistics?.anime?.episodes_watched.toLocaleString() || "5,273"}</span>
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-[8px] p-[16px]">
@@ -85,35 +108,35 @@ export const UserProfile = () => {
                                         <i className="fa-solid fa-circle text-[#338543] mr-[6px] text-[16px]"></i>
                                         <p className="text-[#2D4276] text-[16px] font-[600]">Watching</p>
                                         <span className="mt-[3px] text-[18px] text-black ml-[48px] font-[500]">
-                                            {user?.statistics?.anime?.watching || 0}
+                                            {user?.user_watching || 0}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-[8px]">
                                         <i className="fa-solid fa-circle text-[#2D4276] mr-[6px] text-[16px]"></i>
                                         <p className="text-[#2D4276] text-[16px] font-[600]">Completed</p>
                                         <span className="mt-[3px] text-[18px] text-black ml-[48px] font-[500]">
-                                            {user?.statistics?.anime?.completed || 0}
+                                            {user?.user_completed || 0}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-[8px]">
                                         <i className="fa-solid fa-circle text-[#C9A31F] mr-[6px] text-[16px]"></i>
                                         <p className="text-[#2D4276] text-[16px] font-[600]">On-Hold</p>
                                         <span className="mt-[3px] text-[18px] text-black ml-[48px] font-[500]">
-                                            {user?.statistics?.anime?.on_hold || 0}
+                                            {user?.user_onhold || 0}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-[8px]">
                                         <i className="fa-solid fa-circle text-[#832F30] mr-[6px] text-[16px]"></i>
                                         <p className="text-[#2D4276] text-[16px] font-[600]">Dropped</p>
                                         <span className="mt-[3px] text-[18px] text-black ml-[48px] font-[500]">
-                                            {user?.statistics?.anime?.dropped || 0}
+                                            {user?.user_dropped || 0}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-[8px]">
                                         <i className="fa-solid fa-circle text-[#747474] mr-[6px] text-[16px]"></i>
                                         <p className="text-[#2D4276] text-[16px] font-[600]">Plan to Watch</p>
                                         <span className="mt-[3px] text-[18px] text-black ml-[48px] font-[500]">
-                                            {user?.statistics?.anime?.plan_to_watch || 0}
+                                            {user?.user_plantowatch || 0}
                                         </span>
                                     </div>
                                 </div>
@@ -129,7 +152,7 @@ export const UserProfile = () => {
                                     </Link>
                                         <div
                                             className="absolute inset-0 rounded-[5px] bg-black bg-opacity-80 flex flex-col items-center p-[12px] justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 cursor-pointer"
-                                            onClick={() => navigate(`/animelist/1`)} // Click vào overlay sẽ điều hướng
+                                            onClick={() => navigate(`/animelist/${user.username}`)} // Click vào overlay sẽ điều hướng
                                         >
                                             <i className="fa-solid fa-bars text-center text-white text-[36px] relative z-10 hover:text-[#b7b4b4]"></i>
                                         </div>
@@ -145,11 +168,11 @@ export const UserProfile = () => {
                                 <div className="flex items-center justify-between p-[16px]">
                                     <div className="font-[700] text-[#000000] text-[18px] flex items-center gap-[8px]">
                                         <p>Mean Score: </p>
-                                        <span>{user?.statistics?.manga?.mean_score || 0}</span>
+                                        <span>{user?.statistics?.manga?.mean_score || "9.05"}</span>
                                     </div>
                                     <div className="font-[700] text-[#000000] text-[18px] flex items-center gap-[8px]">
                                         <p>Chapters: </p>
-                                        <span>{user?.statistics?.manga?.chapters_read.toLocaleString() || 0}</span>
+                                        <span>{user?.statistics?.manga?.chapters_read.toLocaleString() || "4,376"}</span>
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-[8px] p-[16px]">

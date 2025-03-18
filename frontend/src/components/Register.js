@@ -7,7 +7,7 @@ import 'aos/dist/aos.css';
 
 export const Register = () => {
 
-    // const [name, setName] = useState("");
+    const [username, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -36,7 +36,7 @@ export const Register = () => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, password }),   
+                body: JSON.stringify({username, email, password }),   
                 // name, email, password biến đã khai báo ở trên
             });
 
@@ -65,20 +65,20 @@ export const Register = () => {
                         <label className="label">
                             <span className="label-text text-black font-[500]">Username</span>
                         </label>
-                        {/* <input
+                        <input
                             type="text"
                             placeholder="Nhập username của bạn"
                             className="input input-bordered w-full bg-gray-50 border-gray-200 text-gray-700 focus:border-gray-400 focus:bg-white"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={username}
+                            onChange={(e) => setUserName(e.target.value)}
                             required
-                        /> */}
-                        <input 
+                        />
+                        {/* <input 
                             type="text"
                             placeholder="Nhập họ tên của bạn" 
                             className="input input-bordered w-full bg-gray-50 border-gray-200 text-gray-700 focus:border-gray-400 focus:bg-white"
                             required 
-                        />
+                        /> */}
                     </div>
 
                     <div className="form-control">

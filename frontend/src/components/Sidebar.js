@@ -19,7 +19,7 @@ export const Sidebar = () => {
                             <Link to={`/anime/${anime.mal_id}`} key={index}>
                                 <div className="flex items-center gap-[1rem] cursor-pointer hover:bg-gray-100 p-[0.5rem] rounded-md">
                                     <img 
-                                        src={anime.images.jpg.image_url} 
+                                        src={anime.large_image_url} 
                                         alt="" 
                                         className="w-[4rem] h-[5rem] object-cover rounded-md"
                                     />
