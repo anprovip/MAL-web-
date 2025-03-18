@@ -3,10 +3,10 @@ from fastapi import APIRouter, HTTPException, Response, status, Depends, Path, Q
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models, schemas, crud
-from typing import Optional, List
+from typing import Optional, List, Dict
 import math
 from ..recommendation_engine import find_similar_animes
-
+from ..compare_anime import compare_anime
 router = APIRouter(prefix="/animes", tags=['Animes'])
 
 # ----- Anime Endpoints -----
@@ -145,6 +145,13 @@ def get_similar_animes(
                             detail=f"Could not find similar anime for id: {anime_id}")
     
     return similar_animes
+
+# Example FastAPI route that uses this function
+
+@router.get("/compare/{anime_id1}/{anime_id2}", response_model=Dict)
+async def compare_two_anime(anime_id1: int, anime_id2: int, db: Session = Depends(get_db)):
+    return compare_anime(anime_id1, anime_id2, db)
+
 
 
 # ----- Stats Endpoint -----
