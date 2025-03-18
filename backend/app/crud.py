@@ -382,3 +382,48 @@ def get_anime_stats(db: Session):
     stats["average_score"] = db.query(func.avg(models.Anime.score)).scalar()
     
     return stats
+def update_user_anime_counters(db: Session, user_id: int):
+    # Lấy tất cả đánh giá của người dùng
+    user_ratings = db.query(models.Rating).filter(models.Rating.user_id == user_id).all()
+    
+    # Khởi tạo các bộ đếm
+    watching_count = 0
+    completed_count = 0
+    onhold_count = 0
+    dropped_count = 0
+    plantowatch_count = 0
+    
+    # Đếm đánh giá theo trạng thái
+    for rating in user_ratings:
+        if rating.my_status == 1:
+            watching_count += 1
+        elif rating.my_status == 2:
+            completed_count += 1
+        elif rating.my_status == 3:
+            onhold_count += 1
+        elif rating.my_status == 4:
+            dropped_count += 1
+        elif rating.my_status == 5:
+            plantowatch_count += 1
+    
+    # Cập nhật bộ đếm của người dùng
+    user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    if user:
+        user.user_watching = watching_count
+        user.user_completed = completed_count
+        user.user_onhold = onhold_count
+        user.user_dropped = dropped_count
+        user.user_plantowatch = plantowatch_count
+        user.total_anime = len(user_ratings)
+        # Tổng số lượng anime khác nhau mà người dùng đã vote
+        user.total_anime = len(user_ratings)
+        # Tính điểm trung bình (chỉ cho anime đã hoàn thành)
+        completed_ratings = [r.my_score for r in user_ratings if r.my_score>0]
+        if completed_ratings:
+            user.mean_score = round(float(sum(completed_ratings)) / len(completed_ratings), 2)
+        else:
+            user.mean_score = 0.0    
+        db.commit()
+        return user
+    
+    return None

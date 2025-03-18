@@ -19,6 +19,8 @@ class UserOut(BaseModel):
     user_onhold: int
     user_dropped: int
     user_plantowatch:int
+    total_anime: int
+    mean_score: float
     class Config:
         from_attributes = True
 
@@ -256,9 +258,19 @@ class PaginatedResponse(BaseModel):
     pages: int
 
 class Rating(BaseModel):
-    anime_id: int
-    my_score:int
+    mal_id: int
     my_status:int
+    my_score: int = 0
+    class Config:
+        from_attributes = True
+
+class RatingOut(BaseModel):
+    mal_id: int
+    my_status:int
+    my_score: int
+    user_id: int
+    rating_id: int
+    create_at: datetime
     class Config:
         from_attributes = True
 
@@ -277,6 +289,13 @@ class SimilarAnimeItem(AnimeResponse):
     """Mở rộng từ AnimeResponse, thêm thông tin về điểm tương đồng"""
     similarity: SimilarityScore
     
+    class Config:
+        from_attributes = True
+
+class RatingUpdate(BaseModel):
+    mal_id: int
+    my_status:int
+    my_score: int 
     class Config:
         from_attributes = True
 

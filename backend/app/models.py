@@ -12,12 +12,13 @@ class User(Base):
     username = Column(String, nullable=False, unique=True)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
-
     user_watching = Column(Integer, nullable=True, server_default=text('0'))
     user_completed = Column(Integer, nullable=True, server_default=text('0'))
     user_onhold = Column(Integer, nullable=True, server_default=text('0'))
     user_dropped = Column(Integer, nullable=True, server_default=text('0'))
     user_plantowatch = Column(Integer, nullable=True, server_default=text('0'))
+    total_anime = Column(Integer, nullable=True, server_default=text('0'))
+    mean_score = Column(Float, nullable=True, server_default=text('0'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
 class Rating(Base):
@@ -25,8 +26,8 @@ class Rating(Base):
     rating_id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     mal_id = Column(Integer, ForeignKey("anime.mal_id", ondelete="CASCADE"), nullable=False)
-    my_score = Column(Integer, CheckConstraint("my_score BETWEEN 1 AND 10"), nullable=False)
-    my_status = Column(Integer, CheckConstraint("my_status IN (1, 2, 3, 4, 6)"), nullable=False)
+    my_score = Column(Integer, CheckConstraint("my_score BETWEEN 0 AND 10"), nullable=False,server_default=text('0'))
+    my_status = Column(Integer, CheckConstraint("my_status IN (1,2,3,4,5)"), nullable=False)
     create_at=  Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
 # Bảng liên kết anime_genres
