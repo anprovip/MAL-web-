@@ -134,7 +134,7 @@ def create_studio(db: Session, studio: schemas.StudioCreate):
 
 
 # ---- Anime CRUD ----
-def get_anime(db: Session, anime_id: int):
+def get_anime(db: Session, anime_id: int) -> models.Anime:
     return db.query(models.Anime).filter(models.Anime.mal_id == anime_id).first()
 
 
@@ -155,6 +155,7 @@ def get_animes(
     min_score: Optional[float] = None,
     sort_by: str = "popularity"
 ) -> Tuple[List[models.Anime], int]:
+    
     query = db.query(models.Anime)
     
     # Apply filters
