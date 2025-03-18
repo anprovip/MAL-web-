@@ -5,6 +5,7 @@ from ..database import get_db
 from .. import models, schemas, crud
 from typing import Optional, List
 import math
+from ..recommendation_engine import find_similar_animes
 
 router = APIRouter(prefix="/animes", tags=['Animes'])
 
@@ -110,6 +111,40 @@ def delete_anime(anime_id: int = Path(..., description="MAL ID of the anime to d
                           detail=f"Anime with id: {anime_id} does not exist")
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.get("/{anime_id}/similar", response_model=schemas.SimilarAnimeResponse, tags=["Recommendations"])
+def get_similar_animes(
+    anime_id: int = Path(..., description="MAL ID of the anime to find similar titles for"),
+    count: int = Query(10, ge=1, le=50, description="Number of similar anime to return"),
+    include_dissimilar: bool = Query(False, description="If True, returns least similar anime instead"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get anime titles similar to the specified anime based on content-based filtering.
+    
+    This endpoint uses collaborative filtering to find anime with similar characteristics
+    to the requested anime.
+    """
+    # Check if anime exists first
+    db_anime = crud.get_anime(db, anime_id)
+    if not db_anime:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Anime with id: {anime_id} was not found")
+    
+    # Call the similarity function
+    similar_animes = find_similar_animes(
+        db=db,
+        mal_id=anime_id,
+        n=count,
+        return_dist=False,
+        neg=include_dissimilar
+    )
+    
+    if not similar_animes:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Could not find similar anime for id: {anime_id}")
+    
+    return similar_animes
 
 
 # ----- Stats Endpoint -----

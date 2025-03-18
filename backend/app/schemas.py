@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, conint
+from pydantic import BaseModel, EmailStr, conint, Field
 from datetime import datetime
 from typing import Optional, List
 
@@ -32,7 +32,7 @@ class  AnimeUpdate(AnimeBase):
     pass
 
 class Anime(AnimeBase):
-    mal_id: int
+    anime_id: int
     user_id: int
 
     class Config:
@@ -256,13 +256,32 @@ class PaginatedResponse(BaseModel):
     pages: int
 
 class Rating(BaseModel):
-    mal_id: int
+    anime_id: int
     my_score:int
     my_status:int
     class Config:
         from_attributes = True
 
 class RatingDelete(BaseModel):
-    mal_id: int
+    anime_id: int
     class Config:
         from_attributes = True
+
+
+class SimilarityScore(BaseModel):
+    """Thông tin về điểm tương đồng giữa anime gốc và anime được đề xuất"""
+    score: float = Field(..., description="Điểm tương đồng dạng số thập phân (0-1)")
+    percentage: str = Field(..., description="Điểm tương đồng dạng phần trăm (đã được định dạng, ví dụ: '85.42%')")
+
+class SimilarAnimeItem(AnimeResponse):
+    """Mở rộng từ AnimeResponse, thêm thông tin về điểm tương đồng"""
+    similarity: SimilarityScore
+    
+    class Config:
+        from_attributes = True
+
+class SimilarAnimeResponse(BaseModel):
+    """Response trả về danh sách anime tương tự"""
+    source_anime: AnimeResponse  # Anime gốc dùng để tìm kiếm
+    similar_anime: List[SimilarAnimeItem]  # Danh sách anime tương tự
+    count: int  # Số lượng anime tương tự được trả về
