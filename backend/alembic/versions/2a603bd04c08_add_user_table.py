@@ -29,11 +29,12 @@ def upgrade() -> None:
         sa.Column('user_onhold', sa.Integer(), nullable=True, server_default=sa.text('0')),
         sa.Column('user_dropped', sa.Integer(), nullable=True, server_default=sa.text('0')),
         sa.Column('user_plantowatch', sa.Integer(), nullable=True, server_default=sa.text('0')), 
+        sa.Column('total_anime', sa.Integer(), nullable=True, server_default=sa.text('0')), 
+        sa.Column('mean_score', sa.Integer(), nullable=True, server_default=sa.text('0')), 
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False, server_default=sa.text('now()')),
         sa.PrimaryKeyConstraint('user_id', name='pk_users'),
         sa.UniqueConstraint('username', name='unique_username'),
         sa.UniqueConstraint('email', name='unique_email'),
-
     )
                     
 
