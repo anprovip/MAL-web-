@@ -3,9 +3,10 @@ from fastapi import APIRouter, HTTPException, Response, status, Depends, Path, Q
 from sqlalchemy.orm import Session
 from ..database import get_db
 from .. import models, schemas, crud
-from typing import Optional, List
+from typing import Optional, List, Dict
 import math
-
+from ..recommendation_engine import find_similar_animes
+from ..compare_anime import compare_anime
 router = APIRouter(prefix="/animes", tags=['Animes'])
 
 # ----- Anime Endpoints -----
@@ -110,6 +111,47 @@ def delete_anime(anime_id: int = Path(..., description="MAL ID of the anime to d
                           detail=f"Anime with id: {anime_id} does not exist")
     
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.get("/{anime_id}/similar", response_model=schemas.SimilarAnimeResponse, tags=["Recommendations"])
+def get_similar_animes(
+    anime_id: int = Path(..., description="MAL ID of the anime to find similar titles for"),
+    count: int = Query(10, ge=1, le=50, description="Number of similar anime to return"),
+    include_dissimilar: bool = Query(False, description="If True, returns least similar anime instead"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get anime titles similar to the specified anime based on content-based filtering.
+    
+    This endpoint uses collaborative filtering to find anime with similar characteristics
+    to the requested anime.
+    """
+    # Check if anime exists first
+    db_anime = crud.get_anime(db, anime_id)
+    if not db_anime:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Anime with id: {anime_id} was not found")
+    
+    # Call the similarity function
+    similar_animes = find_similar_animes(
+        db=db,
+        mal_id=anime_id,
+        n=count,
+        return_dist=False,
+        neg=include_dissimilar
+    )
+    
+    if not similar_animes:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Could not find similar anime for id: {anime_id}")
+    
+    return similar_animes
+
+# Example FastAPI route that uses this function
+
+@router.get("/compare/{anime_id1}/{anime_id2}", response_model=Dict)
+async def compare_two_anime(anime_id1: int, anime_id2: int, db: Session = Depends(get_db)):
+    return compare_anime(anime_id1, anime_id2, db)
+
 
 
 # ----- Stats Endpoint -----

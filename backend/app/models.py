@@ -17,6 +17,8 @@ class User(Base):
     user_onhold = Column(Integer, nullable=True, server_default=text('0'))
     user_dropped = Column(Integer, nullable=True, server_default=text('0'))
     user_plantowatch = Column(Integer, nullable=True, server_default=text('0'))
+    total_anime = Column(Integer, nullable=True, server_default=text('0'))
+    mean_score = Column(Float, nullable=True, server_default=text('0'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
 class Rating(Base):

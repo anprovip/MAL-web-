@@ -11,8 +11,8 @@ router=APIRouter(
 )
 
 
-@router.get("/",response_model=List[schemas.Rating])
-def get_all_rating(db:Session=Depends(database.get_db),skip:int=0,limit:int=10,current_user:models.User=Depends(oauth2.get_current_user)):
+@router.get("/",response_model=List[schemas.RatingOut])
+def get_all_rating(db:Session=Depends(database.get_db),skip:int=0,limit:int=100,current_user:models.User=Depends(oauth2.get_current_user)):
     ratings=db.query(models.Rating).filter(models.Rating.user_id==current_user.user_id).offset(skip).limit(limit).all()
     return ratings
 
@@ -32,6 +32,7 @@ def create_rating(rating:schemas.Rating,db:Session=Depends(database.get_db),curr
         db.add(new_rating)
         db.commit()
         db.refresh(new_rating)
+
         # crud.update_user_anime_counters(db, current_user.user_id)
         return {"message":"Vote created"}
     
@@ -48,6 +49,7 @@ def delete_rating(rating :schemas.RatingDelete,db: Session = Depends(database.ge
     rating_query.delete(synchronize_session=False)
     db.commit()
     # crud.update_user_anime_counters(db, current_user.user_id)
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
@@ -69,5 +71,5 @@ def update_rating( rating: schemas.RatingUpdate, db: Session = Depends(database.
     found_rating.my_status = rating.my_status
     found_rating.create_at = datetime.now()
     db.commit()  
-    
+    # crud.update_user_anime_counters(db, current_user.user_id) 
     return {"message": "Rating updated successfully"}

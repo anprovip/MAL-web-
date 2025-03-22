@@ -1,6 +1,7 @@
 import { useGlobalContext } from "../context/global"
 import { Sidebar } from "./Sidebar";
 import { LazyLoadAnime } from "../custom/LazyLoadAnime";
+import { LazyLoadSearchAnime } from "../custom/LazyLoadSearchAnime";
 
 export const Airing = ({rendered}) => {
     const {airingAnime, isSearch, searchResults} = useGlobalContext();
@@ -9,7 +10,7 @@ export const Airing = ({rendered}) => {
         if(!isSearch && rendered === 'airing') {
             return airingAnime?.map((anime) => <LazyLoadAnime key={anime.mal_id} anime={anime} />);
         } else {
-            return searchResults?.map((anime) => <LazyLoadAnime key={anime.mal_id} anime={anime} />);
+            return searchResults?.map((anime) => <LazyLoadSearchAnime key={anime.mal_id} anime={anime} />);
         }
     }
     return(

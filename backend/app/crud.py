@@ -134,34 +134,10 @@ def create_studio(db: Session, studio: schemas.StudioCreate):
 
 
 # ---- Anime CRUD ----
-def get_anime(db: Session, anime_id: int):
-    result = (
-        db.query(
-            models.Anime,  
-            models.MalStats.score,  
-            models.MalStats.scored_by,  
-            models.MalStats.rank,  
-            models.MalStats.members 
-        )
-        .outerjoin(models.MalStats, models.Anime.mal_id == models.MalStats.mal_id)
-        .filter(models.Anime.mal_id == anime_id)
-        .first()
-    )
 
-    if not result:
-        return None
+def get_anime(db: Session, anime_id: int) -> models.Anime:
+    return db.query(models.Anime).filter(models.Anime.mal_id == anime_id).first()
 
-    anime_obj = result[0]  # Lấy đối tượng `Anime`
-    mal_stats_data = {
-        "score": result[1] if result[1] is not None else 0.0,  # Đặt giá trị mặc định nếu None
-        "scored_by": result[2] if result[2] is not None else 0,
-        "rank": result[3] if result[3] is not None else -1,
-        "members": result[4] if result[4] is not None else 0
-    }
-
-    anime_dict = anime_obj.__dict__.copy()  # Chuyển đối tượng thành dict
-    anime_dict.update(mal_stats_data)  # Gộp thông tin từ `MalStats`
-    anime_dict.pop("_sa_instance_state", None)  # Xóa metadata của SQLAlchemy
 
     return schemas.AnimeResponse(**anime_dict)  # Chuyển thành `AnimeResponse`
 
@@ -183,18 +159,11 @@ def get_animes(
     year: Optional[int] = None,
     min_score: Optional[float] = None,
     sort_by: str = "popularity"
-) -> Tuple[List[dict], int]:  # Trả về danh sách dict thay vì model Anime để có cả MalStats
-    query = (
-        db.query(
-            models.Anime,
-            models.MalStats.score,
-            models.MalStats.scored_by,
-            models.MalStats.rank,
-            models.MalStats.members
-        )
-        .outerjoin(models.MalStats, models.Anime.mal_id == models.MalStats.mal_id)
-    )
 
+) -> Tuple[List[models.Anime], int]:
+    
+    query = db.query(models.Anime)
+    
     # Apply filters
     if title:
         query = query.filter(models.Anime.title.ilike(f"%{title}%"))
@@ -463,3 +432,49 @@ def get_user(db: Session, user_id: int):
     user_dict.pop("_sa_instance_state", None)  # Xóa metadata của SQLAlchemy
 
     return schemas.UserOut(**user_dict)
+
+def update_user_anime_counters(db: Session, user_id: int):
+    # Lấy tất cả đánh giá của người dùng
+    user_ratings = db.query(models.Rating).filter(models.Rating.user_id == user_id).all()
+    
+    # Khởi tạo các bộ đếm
+    watching_count = 0
+    completed_count = 0
+    onhold_count = 0
+    dropped_count = 0
+    plantowatch_count = 0
+    
+    # Đếm đánh giá theo trạng thái
+    for rating in user_ratings:
+        if rating.my_status == 1:
+            watching_count += 1
+        elif rating.my_status == 2:
+            completed_count += 1
+        elif rating.my_status == 3:
+            onhold_count += 1
+        elif rating.my_status == 4:
+            dropped_count += 1
+        elif rating.my_status == 5:
+            plantowatch_count += 1
+    
+    # Cập nhật bộ đếm của người dùng
+    user = db.query(models.User).filter(models.User.user_id == user_id).first()
+    if user:
+        user.user_watching = watching_count
+        user.user_completed = completed_count
+        user.user_onhold = onhold_count
+        user.user_dropped = dropped_count
+        user.user_plantowatch = plantowatch_count
+        user.total_anime = len(user_ratings)
+        # Tổng số lượng anime khác nhau mà người dùng đã vote
+        user.total_anime = len(user_ratings)
+        # Tính điểm trung bình (chỉ cho anime đã hoàn thành)
+        completed_ratings = [r.my_score for r in user_ratings if r.my_score>0]
+        if completed_ratings:
+            user.mean_score = round(float(sum(completed_ratings)) / len(completed_ratings), 2)
+        else:
+            user.mean_score = 0.0    
+        db.commit()
+        return user
+    
+    return None
