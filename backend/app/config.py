@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings 
 import os
+
 class Settings(BaseSettings):
     database_hostname: str
     database_port: int

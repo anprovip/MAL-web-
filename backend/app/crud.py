@@ -134,12 +134,17 @@ def create_studio(db: Session, studio: schemas.StudioCreate):
 
 
 # ---- Anime CRUD ----
+
 def get_anime(db: Session, anime_id: int) -> models.Anime:
     return db.query(models.Anime).filter(models.Anime.mal_id == anime_id).first()
 
 
+    return schemas.AnimeResponse(**anime_dict)  # Chuyển thành `AnimeResponse`
+
 def get_anime_by_title(db: Session, title: str):
-    return db.query(models.Anime).filter(models.Anime.title == title).first()
+    return (
+          db.query(models.Anime).filter(models.Anime.title == title).first()
+    )
 
 
 def get_animes(
@@ -154,6 +159,7 @@ def get_animes(
     year: Optional[int] = None,
     min_score: Optional[float] = None,
     sort_by: str = "popularity"
+
 ) -> Tuple[List[models.Anime], int]:
     
     query = db.query(models.Anime)
@@ -181,16 +187,16 @@ def get_animes(
         query = query.filter(models.Anime.year == year)
         
     if min_score:
-        query = query.filter(models.Anime.score >= min_score)
+        query = query.filter(models.MalStats.score >= min_score)  # Dùng score từ MalStats
     
     # Get total count first
     total = query.count()
     
     # Apply sorting
     if sort_by == "score":
-        query = query.order_by(desc(models.Anime.score))
+        query = query.order_by(desc(models.MalStats.score))
     elif sort_by == "rank":
-        query = query.order_by(models.Anime.rank)
+        query = query.order_by(models.MalStats.rank)
     elif sort_by == "popularity":
         query = query.order_by(models.Anime.popularity)
     elif sort_by == "year":
@@ -199,8 +205,22 @@ def get_animes(
         query = query.order_by(models.Anime.title)
     
     # Apply pagination
-    animes = query.offset(skip).limit(limit).all()
-    
+    results = query.offset(skip).limit(limit).all()
+
+    # Convert to list of dictionaries
+    animes = []
+    for result in results:
+        anime_obj, score, scored_by, rank, members = result  # Giải nén tuple
+        anime_dict = anime_obj.__dict__.copy()
+        anime_dict.update({
+            "score": score if score is not None else 0.0,  # Đặt giá trị mặc định nếu None
+            "scored_by": scored_by if scored_by is not None else 0,
+            "rank": rank if rank is not None else -1,
+            "members": members if members is not None else 0
+        })
+        anime_dict.pop("_sa_instance_state", None)
+        animes.append(anime_dict)
+
     return animes, total
 
 
@@ -383,6 +403,36 @@ def get_anime_stats(db: Session):
     stats["average_score"] = db.query(func.avg(models.Anime.score)).scalar()
     
     return stats
+
+def get_user(db: Session, user_id: int):
+    result = (
+        db.query(
+            models.User,  
+            models.UserStats.total_anime_rated,  
+            models.UserStats.total_anime,  
+            models.UserStats.mean_score,  
+        )
+        .outerjoin(models.UserStats, models.User.user_id == models.UserStats.user_id)
+        .filter(models.User.user_id == user_id)
+        .first()
+    )
+
+    if not result:
+        return None
+
+    user_obj = result[0] 
+    user_stats_data = {
+        "total_anime_rated": result[1] if result[1] is not None else 0,  # Đặt giá trị mặc định nếu None
+        "total_anime": result[2] if result[2] is not None else 0,
+        "mean_score": result[3] if result[3] is not None else 0.0,
+    }
+
+    user_dict = user_obj.__dict__.copy()  # Chuyển đối tượng thành dict
+    user_dict.update(user_stats_data) 
+    user_dict.pop("_sa_instance_state", None)  # Xóa metadata của SQLAlchemy
+
+    return schemas.UserOut(**user_dict)
+
 def update_user_anime_counters(db: Session, user_id: int):
     # Lấy tất cả đánh giá của người dùng
     user_ratings = db.query(models.Rating).filter(models.Rating.user_id == user_id).all()

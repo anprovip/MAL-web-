@@ -4,7 +4,10 @@ from .database import engine, get_db
 from .routers import  user, auth,anime,rating
 from .config import settings
 from fastapi.middleware.cors import CORSMiddleware
-
+#uvicorn app.main:app --reload 
+#venv\Scripts\activate.bat
+#docker compose up -d
+#python import_data.py
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
