@@ -22,7 +22,7 @@ def upgrade() -> None:
    op.create_table('ratings',
         sa.Column('rating_id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
-        sa.Column('mal_id', sa.Integer(), nullable=False),
+        sa.Column('anime_id', sa.Integer(), nullable=False),
         sa.Column('my_score', sa.Float(), nullable=True,server_default=sa.text('0')),
         sa.Column('my_status', sa.Integer(), nullable=True),
         sa.Column('create_at', sa.TIMESTAMP(timezone=True), nullable=False, server_default=sa.text('now()')),

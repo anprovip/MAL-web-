@@ -20,13 +20,13 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.create_table('mal_stats',
         sa.Column('mal_stats_id', sa.Integer(), nullable=False),
-        sa.Column('mal_id', sa.Integer(), nullable=False),
+        sa.Column('anime_id', sa.Integer(), nullable=False),
         sa.Column('score', sa.Float(), nullable=True, server_default=sa.text('0')), 
         sa.Column('scored_by', sa.Integer(), nullable=True, server_default=sa.text('0')),
         sa.Column('rank', sa.Integer(), nullable=True, server_default=sa.text('0')), 
         sa.Column('members', sa.Integer(), nullable=True, server_default=sa.text('0')),
         sa.PrimaryKeyConstraint('mal_stats_id', name='pk_mal_stats'),
-        sa.ForeignKeyConstraint(['mal_id'], ['anime.mal_id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['anime_id'], ['anime.mal_id'], ondelete='CASCADE'),
     )   
 
 def downgrade() -> None:

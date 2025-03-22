@@ -1,30 +1,4 @@
-"""trigger_mal_stats
 
-Revision ID: d8a0197463d9
-Revises: 53875bd6d0c9
-Create Date: 2025-03-21 10:20:14.033353
-
-"""
-from typing import Sequence, Union
-
-from alembic import op
-import sqlalchemy as sa
-
-
-# revision identifiers, used by Alembic.
-revision: str = 'd8a0197463d9'
-down_revision: Union[str, None] = '53875bd6d0c9'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
-
-
-def upgrade():
-    conn = op.get_bind()
-    conn.execute(sa.text(
-    """
-    CREATE OR REPLACE FUNCTION update_mal_stats_table()
-    RETURNS TRIGGER AS $$
-    
     BEGIN
         RAISE NOTICE 'Updating mal_stats table: Operation=%, anime_id=%, my_score=%', 
             TG_OP, 
@@ -102,19 +76,3 @@ def upgrade():
         RETURN NULL; -- Sử dụng NULL với trigger AFTER
     END;
     
-    END;
-    $$ LANGUAGE plpgsql;
-
-    CREATE TRIGGER trg_update_mal_stats_table
-    AFTER INSERT OR UPDATE OR DELETE
-    ON ratings
-    FOR EACH ROW
-    EXECUTE FUNCTION update_mal_stats_table();
-    """
-    ))
-
-def downgrade():
-    # conn = op.get_bind()
-    # conn.execute("DROP TRIGGER IF EXISTS update_mal_stats_table ON ratings;")
-    # conn.execute("DROP FUNCTION IF EXISTS update_mal_stats_table;")
-    pass

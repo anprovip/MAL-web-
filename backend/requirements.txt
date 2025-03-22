@@ -33,3 +33,4 @@ bcrypt==4.3.0
 numpy==1.26.4
 scikit-learn==1.6.1
 google-generativeai
+schedule==1.2.2

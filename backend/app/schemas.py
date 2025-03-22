@@ -150,6 +150,14 @@ class StudioResponse(StudioBase):
     class Config:
         from_attributes = True
 
+class MalStatsResponse(BaseModel):
+    score: float
+    scored_by: int
+    rank: int
+    members: int
+    popularity: int
+    class Config:
+        from_attributes = True
 
 # Schema cho Anime
 class AnimeBase(BaseModel):
@@ -240,10 +248,8 @@ class AnimeResponse(AnimeBase):
     producers: List[ProducerResponse] = []
     licensors: List[LicensorResponse] = []
     studios: List[StudioResponse] = []
-    score:float
-    scored_by:int
-    rank:int
-    members:int
+    mal_stats: Optional[MalStatsResponse] = None
+    
     class Config:
         from_attributes = True
 
@@ -257,16 +263,13 @@ class PaginatedResponse(BaseModel):
     pages: int
 
 class Rating(BaseModel):
-    mal_id: int
+    anime_id: int
     my_status:int
     my_score: int = 0
     class Config:
         from_attributes = True
 
-class RatingOut(BaseModel):
-    mal_id: int
-    my_status:int
-    my_score: int
+class RatingOut(Rating):
     user_id: int
     rating_id: int
     create_at: datetime
@@ -292,18 +295,10 @@ class SimilarAnimeItem(AnimeResponse):
         from_attributes = True
 
 class RatingUpdate(BaseModel):
-    mal_id: int
-    my_status:int
-    my_score: int 
+    pass
     class Config:
         from_attributes = True
 
-class RatingUpdate(BaseModel):
-    mal_id: int
-    my_status:int
-    my_score: int 
-    class Config:
-        from_attributes = True
 class UserStats(BaseModel):
     user_id: int
     class Config:
@@ -316,19 +311,7 @@ class UserStatsOut(BaseModel):
     mean_score: float
     class Config:
         from_attributes = True
-class MalStats(BaseModel):
-    mal_id: int
-    class Config:
-        from_attributes = True 
-class MalStatsOut(BaseModel):
-    mal_stats_id: int
-    mal_id: int
-    score: float
-    scored_by: int
-    rank: int
-    members: int
-    class Config:
-        from_attributes = True  
+
 
 class SimilarAnimeResponse(BaseModel):
     """Response trả về danh sách anime tương tự"""
