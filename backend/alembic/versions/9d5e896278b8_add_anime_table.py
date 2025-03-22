@@ -20,58 +20,58 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # Tạo bảng genres (thể loại)
-    op.create_table(
-        'genres',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=100), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('name')
-    )
+    # op.create_table(
+    #     'genres',
+    #     sa.Column('id', sa.Integer(), nullable=False),
+    #     sa.Column('name', sa.String(length=100), nullable=False),
+    #     sa.PrimaryKeyConstraint('id'),
+    #     sa.UniqueConstraint('name')
+    # )
 
-    # Tạo bảng themes (chủ đề)
-    op.create_table(
-        'themes',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=100), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('name')
-    )
+    # # Tạo bảng themes (chủ đề)
+    # op.create_table(
+    #     'themes',
+    #     sa.Column('id', sa.Integer(), nullable=False),
+    #     sa.Column('name', sa.String(length=100), nullable=False),
+    #     sa.PrimaryKeyConstraint('id'),
+    #     sa.UniqueConstraint('name')
+    # )
 
-    # Tạo bảng demographics (nhân khẩu học)
-    op.create_table(
-        'demographics',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=100), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('name')
-    )
+    # # Tạo bảng demographics (nhân khẩu học)
+    # op.create_table(
+    #     'demographics',
+    #     sa.Column('id', sa.Integer(), nullable=False),
+    #     sa.Column('name', sa.String(length=100), nullable=False),
+    #     sa.PrimaryKeyConstraint('id'),
+    #     sa.UniqueConstraint('name')
+    # )
 
-    # Tạo bảng producers (nhà sản xuất)
-    op.create_table(
-        'producers',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=200), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('name')
-    )
+    # # Tạo bảng producers (nhà sản xuất)
+    # op.create_table(
+    #     'producers',
+    #     sa.Column('id', sa.Integer(), nullable=False),
+    #     sa.Column('name', sa.String(length=200), nullable=False),
+    #     sa.PrimaryKeyConstraint('id'),
+    #     sa.UniqueConstraint('name')
+    # )
 
-    # Tạo bảng licensors (đơn vị cấp phép)
-    op.create_table(
-        'licensors',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=200), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('name')
-    )
+    # # Tạo bảng licensors (đơn vị cấp phép)
+    # op.create_table(
+    #     'licensors',
+    #     sa.Column('id', sa.Integer(), nullable=False),
+    #     sa.Column('name', sa.String(length=200), nullable=False),
+    #     sa.PrimaryKeyConstraint('id'),
+    #     sa.UniqueConstraint('name')
+    # )
 
-    # Tạo bảng studios (xưởng phim)
-    op.create_table(
-        'studios',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('name', sa.String(length=200), nullable=False),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('name')
-    )
+    # # Tạo bảng studios (xưởng phim)
+    # op.create_table(
+    #     'studios',
+    #     sa.Column('id', sa.Integer(), nullable=False),
+    #     sa.Column('name', sa.String(length=200), nullable=False),
+    #     sa.PrimaryKeyConstraint('id'),
+    #     sa.UniqueConstraint('name')
+    # )
 
     # Tạo bảng chính - anime
     op.create_table(
@@ -88,11 +88,7 @@ def upgrade() -> None:
         sa.Column('airing', sa.Boolean(), nullable=True),
         sa.Column('duration', sa.String(length=100), nullable=True),
         sa.Column('rating', sa.String(length=100), nullable=True),
-        sa.Column('score', sa.Float(), nullable=True),
-        sa.Column('scored_by', sa.Float(), nullable=True),
-        sa.Column('rank', sa.Integer(), nullable=True),
         sa.Column('popularity', sa.Integer(), nullable=True),
-        sa.Column('members', sa.Integer(), nullable=True),
         sa.Column('favorites', sa.Integer(), nullable=True),
         sa.Column('season', sa.String(length=50), nullable=True),
         sa.Column('year', sa.Float(), nullable=True),
@@ -131,7 +127,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('mal_id')
     )
 
-    # Tạo bảng liên kết anime_genres
+    #Tạo bảng liên kết anime_genres
     op.create_table(
         'anime_genres',
         sa.Column('anime_id', sa.Integer(), nullable=False),

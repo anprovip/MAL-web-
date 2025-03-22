@@ -35,7 +35,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('user_id', name='pk_users'),
         sa.UniqueConstraint('username', name='unique_username'),
         sa.UniqueConstraint('email', name='unique_email'),
-
     )
                     
 

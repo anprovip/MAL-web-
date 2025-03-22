@@ -20,6 +20,7 @@ class UserOut(BaseModel):
     user_dropped: int
     user_plantowatch:int
     total_anime: int
+    total_anime_rated: int
     mean_score: float
     class Config:
         from_attributes = True
@@ -162,12 +163,7 @@ class AnimeBase(BaseModel):
     airing: Optional[bool] = None
     duration: Optional[str] = None
     rating: Optional[str] = None
-    
-    score: Optional[float] = None
-    scored_by: Optional[float] = None
-    rank: Optional[int] = None
     popularity: Optional[int] = None
-    members: Optional[int] = None
     favorites: Optional[int] = None
     
     season: Optional[str] = None
@@ -244,7 +240,10 @@ class AnimeResponse(AnimeBase):
     producers: List[ProducerResponse] = []
     licensors: List[LicensorResponse] = []
     studios: List[StudioResponse] = []
-
+    score:float
+    scored_by:int
+    rank:int
+    members:int
     class Config:
         from_attributes = True
 
@@ -298,6 +297,38 @@ class RatingUpdate(BaseModel):
     my_score: int 
     class Config:
         from_attributes = True
+
+class RatingUpdate(BaseModel):
+    mal_id: int
+    my_status:int
+    my_score: int 
+    class Config:
+        from_attributes = True
+class UserStats(BaseModel):
+    user_id: int
+    class Config:
+        from_attributes = True
+class UserStatsOut(BaseModel):
+    user_stats_id: int
+    user_id: int
+    total_anime: int
+    total_anime_rated: int
+    mean_score: float
+    class Config:
+        from_attributes = True
+class MalStats(BaseModel):
+    mal_id: int
+    class Config:
+        from_attributes = True 
+class MalStatsOut(BaseModel):
+    mal_stats_id: int
+    mal_id: int
+    score: float
+    scored_by: int
+    rank: int
+    members: int
+    class Config:
+        from_attributes = True  
 
 class SimilarAnimeResponse(BaseModel):
     """Response trả về danh sách anime tương tự"""
