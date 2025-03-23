@@ -121,14 +121,14 @@ CSV HEADER;
 - **Trigger**: Lệnh COPY sẽ kích hoạt các trigger INSERT trên bảng. Nếu có nhiều dữ liệu, có thể làm chậm quá trình nhập.
 - **Tắt trigger tạm thời** (nếu cần thiết):
   ```sql
-  ALTER TABLE tên_bảng DISABLE TRIGGER ALL;
+  ALTER TABLE RATINGS DISABLE TRIGGER ALL;
   -- Thực hiện COPY
-  ALTER TABLE tên_bảng ENABLE TRIGGER ALL;
+  ALTER TABLE RATINGS ENABLE TRIGGER ALL;
   ```
 
 - **Định dạng CSV**: Đảm bảo file CSV có định dạng đúng (dấu phân cách, định dạng dữ liệu) phù hợp với cấu trúc bảng.
 - **Quyền truy cập**: Người dùng PostgreSQL cần có quyền đủ để đọc file và thực hiện lệnh COPY.
-
+- **Chạy file backend/scripts/update_data_after_inset.sql trong pgAdmin**
 ## Xử lý lỗi
 
 1. **Lỗi định dạng dữ liệu**: Kiểm tra loại dữ liệu trong file CSV khớp với cấu trúc bảng.
@@ -147,3 +147,10 @@ Ví dụ:
 SELECT COUNT(*) FROM users;
 SELECT * FROM users LIMIT 10;
 ```
+
+Tạo index:
+```sql
+CREATE INDEX idx_ratings_user_id ON ratings (user_id);
+```
+
+

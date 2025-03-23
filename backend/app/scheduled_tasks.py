@@ -59,12 +59,12 @@ def run_scheduler():
     update_anime_ranks()
     
     # Lập lịch chạy mỗi 8 giờ
-    #schedule.every(8).hours.do(update_anime_ranks)
-    schedule.every(20).seconds.do(update_anime_ranks)
+    schedule.every(8).hours.do(update_anime_ranks)
+    #schedule.every(20).seconds.do(update_anime_ranks)
     # Vòng lặp chạy bộ lập lịch
     while True:
         schedule.run_pending()
-        time.sleep(25)  # Kiểm tra mỗi phút
+        time.sleep(60)  # Kiểm tra mỗi phút
 
 def start_scheduler():
     """Khởi động bộ lập lịch trong thread riêng"""

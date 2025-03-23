@@ -139,8 +139,6 @@ def get_anime(db: Session, anime_id: int) -> models.Anime:
     return db.query(models.Anime).filter(models.Anime.mal_id == anime_id).first()
 
 
-    return schemas.AnimeResponse(**anime_dict)  # Chuyển thành `AnimeResponse`
-
 def get_anime_by_title(db: Session, title: str):
     return (
           db.query(models.Anime).filter(models.Anime.title == title).first()
@@ -433,6 +431,25 @@ def get_user(db: Session, user_id: int):
 
     return schemas.UserOut(**user_dict)
 
+def get_top_animes_by_year(db: Session, year: int, limit: int = 10) -> List[models.Anime]:
+    """
+    Lấy danh sách top anime theo năm, sắp xếp theo điểm đánh giá giảm dần
+    Args:
+        db: Session database
+        year: Năm cần lấy danh sách top anime
+        limit: Số lượng anime muốn lấy (mặc định là 10)
+    Returns:
+        List[models.Anime]: Danh sách các đối tượng Anime
+    """
+    return (
+        db.query(models.Anime)
+        .join(models.MalStats, models.Anime.mal_id == models.MalStats.anime_id)
+        .filter(models.Anime.year == year)
+        .order_by(models.MalStats.score.desc())
+        .limit(limit)
+        .all()
+    )
+
 def update_user_anime_counters(db: Session, user_id: int):
     # Lấy tất cả đánh giá của người dùng
     user_ratings = db.query(models.Rating).filter(models.Rating.user_id == user_id).all()
@@ -478,3 +495,32 @@ def update_user_anime_counters(db: Session, user_id: int):
         return user
     
     return None
+
+def get_user_rated_animes(db: Session, user_id: int, min_score: int = None, limit: Optional[int] = None) -> List[Tuple[int, int]]:
+    """
+    Lấy danh sách anime_id và điểm đánh giá mà người dùng đã đánh giá, được sắp xếp theo điểm đánh giá giảm dần
+    Nếu min_score được cung cấp, chỉ lấy những anime có điểm đánh giá >= min_score
+    Trả về: List các tuple (anime_id, my_score)
+    """
+    query = db.query(models.Rating.anime_id, models.Rating.my_score).filter(models.Rating.user_id == user_id)
+    
+    if min_score is not None:
+        query = query.filter(models.Rating.my_score >= min_score)
+    
+    # Sắp xếp theo score giảm dần
+    query = query.order_by(models.Rating.my_score.desc())
+    
+    # Áp dụng limit nếu được cung cấp
+    if limit is not None:
+        query = query.limit(limit)
+    
+    # Trả về list các tuple (anime_id, my_score)
+    return query.all()
+
+def get_user_first_vote_time(db: Session, user_id: int) -> Optional[datetime]:
+    """
+    Lấy thời gian lần vote đầu tiên của người dùng
+    Trả về: Thời gian lần vote đầu tiên hoặc None nếu người dùng chưa vote bao giờ
+    """
+    first_vote = db.query(models.Rating.created_at).filter(models.Rating.user_id == user_id).order_by(models.Rating.created_at.asc()).first()
+    return first_vote[0] if first_vote else None

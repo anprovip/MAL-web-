@@ -47,7 +47,6 @@ def delete_rating(rating :schemas.RatingDelete,db: Session = Depends(database.ge
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to perform requested action")
     rating_query.delete(synchronize_session=False)
     db.commit()
-    # crud.update_user_anime_counters(db, current_user.user_id)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
