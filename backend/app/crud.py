@@ -145,6 +145,11 @@ def get_anime_by_title(db: Session, title: str):
     )
 
 
+from sqlalchemy.orm import Session
+from sqlalchemy import desc
+from typing import List, Optional, Tuple
+from . import models
+
 def get_animes(
     db: Session, 
     skip: int = 0, 
@@ -157,10 +162,9 @@ def get_animes(
     year: Optional[int] = None,
     min_score: Optional[float] = None,
     sort_by: str = "popularity"
-
 ) -> Tuple[List[models.Anime], int]:
     
-    query = db.query(models.Anime)
+    query = db.query(models.Anime, models.MalStats.score, models.MalStats.scored_by, models.MalStats.rank, models.MalStats.members).join(models.MalStats, models.Anime.mal_id == models.MalStats.anime_id)
     
     # Apply filters
     if title:
@@ -196,7 +200,7 @@ def get_animes(
     elif sort_by == "rank":
         query = query.order_by(models.MalStats.rank)
     elif sort_by == "popularity":
-        query = query.order_by(models.Anime.popularity)
+        query = query.order_by(models.MalStats.popularity)
     elif sort_by == "year":
         query = query.order_by(desc(models.Anime.year))
     else:

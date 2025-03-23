@@ -101,8 +101,6 @@ def upgrade():
 
         RETURN NULL; -- Sử dụng NULL với trigger AFTER
     END;
-    
-    END;
     $$ LANGUAGE plpgsql;
 
     CREATE TRIGGER trg_update_mal_stats_table
