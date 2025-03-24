@@ -1,110 +1,185 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useGlobalContext } from '../context/global';
 import AOS from "aos";
 import 'aos/dist/aos.css';
 
 export const RecommendationsManga = () => {
-
-    const {mangaRecommendations, getMangaRecommendations} = useGlobalContext();
-    useEffect(() => {
-        getMangaRecommendations();
-        AOS.init({duration: 800});
-    }, []);
+    const { loading } = useGlobalContext();
     const location = useLocation();
     const fromPage = location.state?.from || "/";
 
-    const conditionalRender = () => {
-        return mangaRecommendations?.map((recommendation, index) => {
-            const [manga1, manga2] = recommendation.entry;
-            return (
-                <div className="recommend-anime flex flex-wrap justify-between items-center mb-[64px]
-                    bg-[#fff] border-t-[5px] border-b-[5px] p-[48px] border-[#e5e7eb]" key={`${recommendation.mal_id}-${index}`} data-aos="fade-up">
-                    <div className='text-[20px] text-[#98C56C] font-[700]'>
-                        If you liked:
-                    </div>
-                    <Link 
-                        className="relative max-w-[370px] h-[500px] ml-[-300px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
-                        to={`/manga/${manga1.mal_id}`} 
-                        key={manga1.mal_id}
-                    >
-                        <img 
-                            className="w-full h-full object-cover rounded-[5px]" 
-                            src={manga1.images.jpg.large_image_url} 
-                            alt={manga1.title} 
-                        />
-                        <div className="text-center font-[600] text-[18px] mt-[8px] mx-[4px] line-clamp-2">
-                            {manga1.title}
-                        </div>
-                        <div className="absolute inset-0 rounded-[5px] bg-black bg-opacity-80 flex items-start p-[12px] justify-start opacity-0 hover:opacity-100 transition-opacity duration-300">
-                            <div className="text-white">
-                                <h3 className="text-[24px] font-[700]">{manga1.title}</h3>
-                                <p className="mt-[8px] mb-[32px]">Click to see score <i className="text-[#F3DF4C] fa-solid fa-star"></i></p>
-                                <p className="text-[16px] mt-[16px] line-clamp-6">Click to see more information</p>
-                            </div>
-                        </div>
-                    </Link>
-                    <div className='text-[20px] text-[#98C56C] font-[700] mr-[-325px]'>
-                        ...Then you might like:
-                    </div>
-                    <Link 
-                        className="relative max-w-[370px] h-[500px] border-[5px] bg-[#e5e7eb] border-[#e5e7eb] pb-[64px] rounded-[7px] overflow-hidden"
-                        to={`/manga/${manga2.mal_id}`} 
-                        key={manga2.mal_id}
-                    >
-                        <img 
-                            className="w-full h-full object-cover rounded-[5px]" 
-                            src={manga2.images.jpg.large_image_url} 
-                            alt={manga2.title} 
-                        />
-                        <div className="text-center font-[600] text-[18px] mt-[8px] mx-[4px] line-clamp-2">
-                            {manga2.title}
-                        </div>
-                        <div className="absolute inset-0 rounded-[5px] bg-black bg-opacity-80 flex items-start p-[12px] justify-start opacity-0 hover:opacity-100 transition-opacity duration-300">
-                            <div className="text-white">
-                                <h3 className="text-[24px] font-[700]">{manga2.title}</h3>
-                                <p className="mt-[8px] mb-[32px]">Click to see score <i className="text-[#F3DF4C] fa-solid fa-star"></i></p>
-                                <p className="text-[16px] mt-[16px] line-clamp-6">Click to see more information</p>
-                            </div>
-                        </div>
-                    </Link>
-                    <div className="text-center font-[500] text-[18px] mt-[64px] w-full mx-[200px]" data-aos="fade-up">
-                        {recommendation.content}
-                    </div>
-                </div>
-            );
-        });
-    }
+    // State để lưu hai ID anime và dữ liệu so sánh
+    const [animeId1, setAnimeId1] = useState('');
+    const [animeId2, setAnimeId2] = useState('');
+    const [comparisonData, setComparisonData] = useState(null);
+    const [error, setError] = useState('');
 
-    return(
-        <>  
-            <div className="bg-[#ededed] text-black px-[32px] py-[32px]">
-                <Link to={fromPage} className="font-[700] text-[#EB5757] text-[22px] flex items-center gap-[8px]">
-                    <i className="fas fa-arrow-left"></i>
-                    Back to {fromPage === "/manga" ? "Manga Home" : "Anime Home"}
-                </Link>
-                <header className="py-[32px] px-[80px] w-[90%] mx-auto my-0 transition-all duration-custom ease-custom flex flex-col items-center justify-center">
-                    <div className="logo flex items-center justify-center mb-[32px]">
-                        <h1 className="text-[48px] font-[700]">
-                            Manga Recommendations
-                        </h1>
+    useEffect(() => {
+        AOS.init({ duration: 800 });
+    }, []);
+
+    // Hàm gọi API so sánh
+    const fetchComparison = async () => {
+        if (!animeId1 || !animeId2) {
+            setError('Vui lòng nhập cả hai ID anime');
+            return;
+        }
+
+        setError('');
+        setComparisonData(null);
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/animes/compare/${animeId1}/${animeId2}`, {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Không thể lấy dữ liệu so sánh');
+            }
+
+            const data = await response.json();
+            setComparisonData(data);
+        } catch (err) {
+            setError(err.message);
+            setComparisonData(null);
+        }
+    };
+
+    // Xử lý submit form
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        fetchComparison();
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+                {/* Tiêu đề */}
+                <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center" data-aos="fade-down">
+                    CompareAnime
+                </h1>
+
+                {/* Form nhập ID */}
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4 justify-center mb-8" data-aos="fade-up">
+                    <input
+                        type="number"
+                        value={animeId1}
+                        onChange={(e) => setAnimeId1(e.target.value)}
+                        placeholder="Nhập ID Anime 1 (VD: 1)"
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                        type="number"
+                        value={animeId2}
+                        onChange={(e) => setAnimeId2(e.target.value)}
+                        placeholder="Nhập ID Anime 2 (VD: 20)"
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                        type="submit"
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+                    >
+                        So sánh
+                    </button>
+                </form>
+
+                {/* Hiển thị lỗi nếu có */}
+                {error && (
+                    <p className="text-red-500 text-center mb-4" data-aos="fade-up">
+                        {error}
+                    </p>
+                )}
+
+                {/* Hiển thị loading */}
+                {loading && (
+                    <div className="flex justify-center items-center h-64">
+                        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
                     </div>
-                    <div className="dropdown dropdown-hover mb-[64px]">
-                        <div tabIndex={0} role="button" className="btn m-1 rounded-[30px] w-[275px] font-[500] text-[20px] h-[58px] hover:text-[#ffffff]">Recommendations <i class="fa-solid fa-chess-queen mb-[2px] ml-[4px]"></i></div>
-                        <ul tabIndex={0} className="dropdown-content menu bg-base-100 z-[1] ml-[16px] p-[4px] shadow w-[250px] rounded-[20px]">
-                            <li>
-                                <Link to={`/recommendations/manga`} state={{fromPage}} className='text-[#A5ACBA] text-[16px] text-center hover:text-[#ffffff]'>Manga Recommendations</Link>
-                            </li>
-                            <li>
-                                <Link to={`/recommendations/anime`} state={{fromPage}} className='text-[#A5ACBA] text-[16px] text-center hover:text-[#ffffff]'>Anime Recommendations</Link>
-                            </li>
-                        </ul>
+                )}
+
+                {/* Hiển thị kết quả so sánh */}
+                {comparisonData && !loading && (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" data-aos="fade-up">
+                        {/* Anime 1 */}
+                        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                            <img
+                                src={comparisonData.entry[0].images.jpg.large_image_url}
+                                alt={comparisonData.entry[0].title}
+                                className="w-full h-64 object-cover"
+                                onError={(e) => {
+                                    e.target.src = 'https://via.placeholder.com/300x450?text=No+Image';
+                                }}
+                            />
+                            <div className="p-4">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                                    {comparisonData.entry[0].title}
+                                </h2>
+                                <p className="text-gray-600 text-sm">
+                                    MAL ID: {comparisonData.entry[0].mal_id}
+                                </p>
+                                <Link
+                                    to={comparisonData.entry[0].url}
+                                    target="_blank"
+                                    className="text-blue-500 hover:underline mt-2 block"
+                                >
+                                    Xem trên MyAnimeList
+                                </Link>
+                            </div>
+                        </div>
+
+                        {/* Nội dung so sánh */}
+                        <div className="bg-white rounded-lg shadow-md p-6 lg:col-span-1">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                                So sánh giữa hai anime
+                            </h3>
+                            <p className="text-gray-600 text-sm leading-relaxed">
+                                {comparisonData.content}
+                            </p>
+                        </div>
+
+                        {/* Anime 2 */}
+                        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                            <img
+                                src={comparisonData.entry[1].images.jpg.large_image_url}
+                                alt={comparisonData.entry[1].title}
+                                className="w-full h-64 object-cover"
+                                onError={(e) => {
+                                    e.target.src = 'https://via.placeholder.com/300x450?text=No+Image';
+                                }}
+                            />
+                            <div className="p-4">
+                                <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                                    {comparisonData.entry[1].title}
+                                </h2>
+                                <p className="text-gray-600 text-sm">
+                                    MAL ID: {comparisonData.entry[1].mal_id}
+                                </p>
+                                <Link
+                                    to={comparisonData.entry[1].url}
+                                    target="_blank"
+                                    className="text-blue-500 hover:underline mt-2 block"
+                                >
+                                    Xem trên MyAnimeList
+                                </Link>
+                            </div>
+                        </div>
                     </div>
-                </header>
-                <div className="">
-                    {conditionalRender()}
+                )}
+
+                {/* Nút quay lại */}
+                <div className="mt-8 text-center">
+                    <Link
+                        to={fromPage}
+                        className="text-blue-500 hover:underline font-semibold"
+                    >
+                        Quay lại {fromPage === "/manga" ? "Manga Home" : "Anime Home"}
+                    </Link>
                 </div>
             </div>
-        </>
-    )
-}
+        </div>
+    );
+};

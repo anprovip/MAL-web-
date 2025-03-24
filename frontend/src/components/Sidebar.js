@@ -27,7 +27,7 @@ export const Sidebar = () => {
                                         <h4 className="text-[17px] font-[600] line-clamp-2">{anime.title}</h4>
                                         <div className="info flex gap-[0.5rem] mt-[0.5rem]">
                                             <span className="text-[13px]">{anime.episodes} Episodes</span>
-                                            <span className="text-[13px]">{anime.score} <i className="fas fa-star text-yellow-500"></i></span>
+                                            <span className="text-[13px]">{anime.mal_stats.score.toFixed(2)} <i className="fas fa-star text-yellow-500"></i></span>
                                         </div>
                                     </div>
                                 </div>

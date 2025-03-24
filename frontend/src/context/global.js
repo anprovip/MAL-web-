@@ -41,8 +41,10 @@ const reducer = (state, action) => {
         case GET_UPCOMING_ANIME:
             return {
                 ...state,
-                upcomingAnime: action.payload,
-                loading: false
+                upcomingAnime: action.payload.items,
+                upcomingPage: action.payload.page || 1, // Lưu trang hiện tại
+                upcomingTotal: action.payload.total || 0, // Tổng số anime (nếu có)
+                loading: false,
             }
         case GET_AIRING_ANIME:
             return {
@@ -108,12 +110,16 @@ export const GlobalContextProvider = ({ children }) => {
     const initialState = {
         popularAnime: [],
         upcomingAnime: [],
+        upcomingPage: 1, // Trang hiện tại
+        upcomingTotal: 0, // Tổng số anime (nếu API không cung cấp, cần xử lý thủ công)
         airingAnime: [],
         pictures: [],
         isSearch: false,
         isSearchManga: false,
         searchResults: [],
         loading: false,
+        animeRecommendations: [], // Thêm dòng này
+        mangaRecommendations: [],
     };
 
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -167,12 +173,33 @@ export const GlobalContextProvider = ({ children }) => {
         dispatch({ type: GET_POPULAR_ANIME, payload: data.items });
     }
 
-    const getUpcomingAnime = async () => {
+    const getUpcomingAnime = async (page = 1, size = 8) => {
         dispatch({ type: LOADING });
-        const response = await fetch(`http://127.0.0.1:8000/animes/?page=1&size=100&sort_by=rank`);
+        const response = await fetch(`http://127.0.0.1:8000/animes/?page=${page}&size=${size}&sort_by=rank`);
         const data = await response.json();
-        dispatch({ type: GET_UPCOMING_ANIME, payload: data.items });
-    }
+        dispatch({
+            type: GET_UPCOMING_ANIME,
+            payload: {
+                items: data.items,
+                page: page,
+                total: data.total || 0, // Nếu API không trả về total, mặc định là 0
+            },
+        });
+    };
+
+    const loadMoreUpcomingAnime = async (page, size = 4) => {
+        dispatch({ type: LOADING });
+        const response = await fetch(`http://127.0.0.1:8000/animes/?page=${page}&size=${size}&sort_by=rank`);
+        const data = await response.json();
+        dispatch({
+            type: GET_UPCOMING_ANIME,
+            payload: {
+                items: [...state.upcomingAnime, ...data.items], // Nối danh sách mới vào danh sách cũ
+                page: page,
+                total: data.total || 0,
+            },
+        });
+    };
 
     const getAiringAnime = async () => {
         dispatch({ type: LOADING });
@@ -239,11 +266,28 @@ export const GlobalContextProvider = ({ children }) => {
     }
 
     const getAnimeRecommendations = async () => {
+        const token = localStorage.getItem('token');
         dispatch({ type: LOADING });
-        const response = await fetch(`https://api.jikan.moe/v4/recommendations/anime`);
-        const data = await response.json();
-        dispatch({ type: GET_ANIME_RECOMMENDATIONS, payload: data.data });
-    }
+        try {
+            const response = await fetch('http://127.0.0.1:8000/animes/anime/recommendation', {
+                method: 'GET',
+                headers: {
+                    'accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to fetch anime recommendations');
+            }
+            
+            const data = await response.json();
+            dispatch({ type: GET_ANIME_RECOMMENDATIONS, payload: data });
+        } catch (error) {
+            console.error('Error fetching recommendations:', error);
+            dispatch({ type: GET_ANIME_RECOMMENDATIONS, payload: [] });
+        }
+    };
 
     const getMangaRecommendations = async () => {
         dispatch({ type: LOADING });
@@ -253,6 +297,7 @@ export const GlobalContextProvider = ({ children }) => {
     }
     useEffect(() => {
         getPopularAnime();
+        getUpcomingAnime(1, 8);
     }, []);
 
     return(
@@ -270,6 +315,7 @@ export const GlobalContextProvider = ({ children }) => {
             setSearchMangas,
             getPopularAnime,
             getUpcomingAnime,
+            loadMoreUpcomingAnime,
             getAiringAnime,
             getTopAnime,
             getTopManga,

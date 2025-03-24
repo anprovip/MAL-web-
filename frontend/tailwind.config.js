@@ -31,6 +31,7 @@ module.exports = {
       boxShadow: {
         'all-around': '0 2px 2px rgba(0, 0, 0, 0.2), 0 -2px 2px rgba(0, 0, 0, 0.1), 2px 0 2px rgba(0, 0, 0, 0.15), -2px 0 2px rgba(0, 0, 0, 0.15)',
       },
+      
       // colors: {
       //   primary: '#4318FF',
       //   dark: '#1B2559',

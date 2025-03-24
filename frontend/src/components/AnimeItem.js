@@ -7,15 +7,15 @@ import Swal from "sweetalert2";
 
 export const AnimeItem = () => {
     const { id } = useParams();
-    const [anime, setAnime] = useState({});
-    const [animePrevent, setAnimePrevent] = useState({});
+    const [anime, setAnime] = useState(null);
+    const [animePrevent, setAnimePrevent] = useState(null);
     const [characters, setCharacters] = useState([]);
     const [showMore, setShowMore] = useState(false);
     const [status, setStatus] = useState(""); // State để lưu giá trị status
     const [score, setScore] = useState(""); // State để lưu giá trị score
 
-    const { title, episodes, synopsis, duration, aired_from, aired_to, season, large_image_url, rank, score: animeScore, scored_by, popularity, status: animeStatus, rating, genres, producers } = anime;
-    const { trailer } = animePrevent;
+    const { title, episodes, synopsis, duration, aired_from, aired_to, season, large_image_url, mal_stats, status: animeStatus, rating, genres, producers } = anime || {};
+    const { trailer } = animePrevent || {};
 
     // Get anime by id
     const getAnime = async (animeId) => {
@@ -70,7 +70,7 @@ export const AnimeItem = () => {
         };
 
         const ratingData = {
-            mal_id: parseInt(id),
+            anime_id: parseInt(id),
             my_status: statusMap[status],
             my_score: parseInt(score),
         };
@@ -108,12 +108,29 @@ export const AnimeItem = () => {
         window.scrollTo(0, 0);
     }, [id]);
 
+    const isLoading = !anime || !animePrevent;
+
+    // Nếu chưa tải xong dữ liệu chính, hiển thị loading bar
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <span className="loading loading-bars absolute top-[50%] left-[50%] w-[64px]"></span>
+            </div>
+        );
+    }
+
     return (
         <>
             <div className="py-[24px] px-[16px] sm:py-[32px] sm:px-[24px] md:py-[36px] md:px-[48px] lg:py-[42px] lg:px-[128px] xl:py-[48px] xl:px-[192px] 2xl:py-[48px] 2xl:px-[288px] bg-[#EDEDED]">
+                <Link to="/" className="block bg-[#4F74C8] text-white text-center px-4 py-2 rounded-md hover:bg-[#294586] transition duration-300 mb-4 w-[10%]">
+                    <i className="fa-solid fa-arrow-left mr-2"></i>
+                    Back
+                </Link>
                 <h1 className="inline-block text-[28px] sm:text-[32px] md:text-[36px] lg:text-[42px] xl:text-[48px] mb-[16px] sm:mb-[20px] md:mb-[24px] cursor-pointer bg-custom-gradient font-[900] bg-clip-text text-transparent transition-all duration-custom ease-custom transform hover:text-gray-900">
                     {title}
                 </h1>
+
+
                 <div className="details bg-[#ffffff] rounded-[20px] p-[16px] sm:p-[24px] md:p-[28px] lg:p-[32px] border-[3px] sm:border-[4px] md:border-[5px] border-[#e5e7eb]">
                     <div className="detail grid grid-cols-1 md:grid-cols-2 gap-[16px] sm:gap-[20px] md:gap-[24px] lg:gap-[32px]">
                         <div className="image relative" data-aos="fade-down">
@@ -138,6 +155,12 @@ export const AnimeItem = () => {
                         <input type="checkbox" id={`modal_${id}`} className="modal-toggle" />
                         <div className="modal" role="dialog">
                             <div className="modal-box bg-[#efecec] w-[90%] max-w-lg">
+                                <label
+                                    htmlFor={`modal_${anime.mal_id}`}
+                                    className="absolute top-[0px] right-[16px] text-black text-[32px] cursor-pointer hover:text-gray-700"
+                                >
+                                    &times;
+                                </label>
                                 <h3 className="text-lg font-bold text-black">{title}</h3>
                                 <form className="mt-[20px]" onSubmit={handleSubmit}>
                                     <div className="mb-[24px]">
@@ -223,14 +246,14 @@ export const AnimeItem = () => {
                                 <span className="font-[700] text-[#454e56] text-[16px] sm:text-[18px] md:text-[20px]">
                                     Rank:
                                 </span>
-                                <span className="text-black text-[14px] sm:text-[16px] md:text-[18px]">{rank}</span>
+                                <span className="text-black text-[14px] sm:text-[16px] md:text-[18px]">{mal_stats.rank}</span>
                             </p>
                             <p className="flex gap-[4px] sm:gap-[6px] md:gap-[8px] items-center">
                                 <span className="font-[700] text-[#454e56] text-[16px] sm:text-[18px] md:text-[20px]">
                                     Score:
                                 </span>
                                 <span className="text-black text-[14px] sm:text-[16px] md:text-[18px]">
-                                    {animeScore}
+                                    {mal_stats.score.toFixed(2) || "No score yet"}
                                 </span>
                                 <i className="text-[#F3DF4C] mb-[2px] fa-solid fa-star"></i>
                             </p>
@@ -239,7 +262,7 @@ export const AnimeItem = () => {
                                     Scored By:
                                 </span>
                                 <span className="text-black text-[14px] sm:text-[16px] md:text-[18px]">
-                                    {scored_by?.toLocaleString() || "No users scored yet"} users
+                                    {mal_stats.scored_by?.toLocaleString() || "No users scored yet"} users
                                 </span>
                             </p>
                             <p className="flex gap-[8px] sm:gap-[12px] md:gap-[16px] items-center">
@@ -247,7 +270,7 @@ export const AnimeItem = () => {
                                     Popularity:
                                 </span>
                                 <span className="text-black text-[14px] sm:text-[16px] md:text-[18px]">
-                                    {popularity}
+                                    {mal_stats.popularity}
                                 </span>
                             </p>
                             <p className="flex gap-[8px] sm:gap-[12px] md:gap-[16px] items-center">

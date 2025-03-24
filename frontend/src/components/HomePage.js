@@ -141,6 +141,12 @@ export const HomePage = () => {
                 {/* Modal Login */}
                 <dialog id="my_modal_2" className="modal">
                     <div className="modal-box bg-white shadow-lg w-11/12 max-w-md sm:max-w-lg md:max-w-xl">
+                        <label
+                            htmlFor={`close_modal`}
+                            className="absolute top-[0px] right-[16px] text-black text-[32px] cursor-pointer hover:text-gray-700"
+                        >
+                            &times;
+                        </label>
                         <h3 className="font-bold text-lg sm:text-xl mb-4 text-black">Đăng nhập</h3>
                         <form
                             className="flex flex-col gap-4"
@@ -181,27 +187,30 @@ export const HomePage = () => {
                             </p>
                         </form>
                     </div>
+                    
                     <form method="dialog" className="modal-backdrop">
-                        <button>close</button>
+                        <button id="close_modal">Close</button>
                     </form>
                 </dialog>
 
                 {/* Header */}
                 <header className="py-4 sm:py-6 md:py-8 px-4 sm:px-8 md:px-12 lg:px-20 w-full sm:w-[90%] mx-auto transition-all duration-custom ease-custom">
-                    <div className="logo flex items-center justify-center mb-4 sm:mb-6 md:mb-8">
+                    <div className="logo flex items-center justify-center mb-6 sm:mb-8 md:mb-12">
                         <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-[700] text-center">
-                            {rendered === 'popular' ? 'Popular Anime' : rendered === 'airing' ? 'Airing Anime' : 'Top 100 Anime of All Times'}
+                            {rendered === 'popular' ? 'Popular Anime' : rendered === 'airing' ? 'Airing Anime' : 'Top 1000 Anime of All Times'}
                         </h1>
                     </div>
 
                     {/* Search Container */}
                     <div className="search-container flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 flex-wrap">
-                        <button
-                            className="py-2 px-4 sm:py-3 sm:px-6 font-[500] rounded-[30px] text-sm sm:text-base md:text-lg bg-[#fff] border-[3px] border-[#2A3441] hover:bg-[#e5e7eb] transition-all duration-custom ease-custom"
-                            onClick={() => setRendered('popular')}
-                        >
-                            Popular <i className="fas fa-fire"></i>
-                        </button>
+                        <div className="tooltip before:bg-white before:text-[#1E1E1E] before:text-[12px] before:p-2 before:rounded-lg" data-tip="Explore the most Popular Anime" >
+                            <button
+                                className="py-2 px-4 sm:py-3 sm:px-6 font-[500] rounded-[30px] text-sm sm:text-base md:text-lg bg-[#fff] border-[3px] border-[#2A3441] hover:bg-[#e5e7eb]"
+                                onClick={() => setRendered('popular')}
+                            >
+                                Popular <i className="fas fa-fire"></i>
+                            </button>
+                        </div>
                         <form action="" className="search-form relative w-full sm:w-auto flex-grow" onSubmit={handleSubmit}>
                             <div className="input-control relative">
                                 <input
@@ -219,30 +228,36 @@ export const HomePage = () => {
                                 </button>
                             </div>
                         </form>
-                        <button
-                            className="py-2 px-4 sm:py-3 sm:px-6 font-[500] rounded-[30px] text-sm sm:text-base md:text-lg bg-[#fff] border-[3px] border-[#2A3441] hover:bg-[#e5e7eb] transition-all duration-custom ease-custom"
-                            onClick={() => {
-                                setRendered('airing');
-                                getAiringAnime();
-                            }}
-                        >
-                            Airing
-                        </button>
-                        <button
-                            className="py-2 px-4 sm:py-3 sm:px-6 font-[500] rounded-[30px] text-sm sm:text-base md:text-lg bg-[#fff] border-[3px] border-[#2A3441] hover:bg-[#e5e7eb] transition-all duration-custom ease-custom"
-                            onClick={() => {
-                                setRendered('upcoming');
-                                getUpcomingAnime();
-                            }}
-                        >
-                            Top 100 of All Times
-                        </button>
-                        <button
-                            className="w-full sm:w-auto py-2 px-4 sm:py-3 sm:px-6 font-[500] rounded-[30px] text-sm sm:text-base md:text-lg bg-[#fff] border-[3px] border-[#2A3441] hover:bg-[#e5e7eb] transition-all duration-custom ease-custom"
-                            onClick={handleManga}
-                        >
-                            Explore Manga <i className="fa-solid fa-meteor"></i>
-                        </button>
+                        <div className="tooltip before:bg-white before:text-[#1E1E1E] before:text-[12px] before:p-2 before:rounded-lg" data-tip="Explore the most Watched Anime now" >
+                            <button
+                                className="py-2 px-4 sm:py-3 sm:px-6 font-[500] rounded-[30px] text-sm sm:text-base md:text-lg bg-[#fff] border-[3px] border-[#2A3441] hover:bg-[#e5e7eb]"
+                                onClick={() => {
+                                    setRendered('airing');
+                                    getAiringAnime();
+                                }}
+                            >
+                                Airing
+                            </button>
+                        </div>
+                        <div className="tooltip before:bg-white before:text-[#1E1E1E] before:text-[12px] before:p-2 before:rounded-lg" data-tip="Explore Top 1000 of All Times" >
+                            <button
+                                className="py-2 px-4 sm:py-3 sm:px-6 font-[500] rounded-[30px] text-sm sm:text-base md:text-lg bg-[#fff] border-[3px] border-[#2A3441] hover:bg-[#e5e7eb]"
+                                onClick={() => {
+                                    setRendered('upcoming');
+                                    getUpcomingAnime();
+                                }}
+                            >
+                                Top 1000 of All Times
+                            </button>
+                        </div>
+                        <div className="tooltip before:bg-white before:text-[#1E1E1E] before:text-[12px] before:p-2 before:rounded-lg" data-tip="All about Manga">
+                            <button
+                                className="w-full sm:w-auto py-2 px-4 sm:py-3 sm:px-6 font-[500] rounded-[30px] text-sm sm:text-base md:text-lg bg-[#fff] border-[3px] border-[#2A3441] hover:bg-[#e5e7eb]"
+                                onClick={handleManga}
+                            >
+                                Explore Manga <i className="fa-solid fa-meteor"></i>
+                            </button>
+                        </div>
                         <div className="dropdown dropdown-hover w-full sm:w-auto">
                             <div
                                 tabIndex={0}

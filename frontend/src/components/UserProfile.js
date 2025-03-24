@@ -60,7 +60,7 @@ export const UserProfile = () => {
                     {user.username}'s Profile
                     <button className="text-[20px] flex items-center gap-[8px] hover:text-[#f53535]" onClick={handleLogout}>
                         <i class="fa-solid fa-right-from-bracket"></i>
-                        <p className="mb-[3px]">Logout</p>
+                        <p className="mb-[3px]">Back</p>
                     </button>
                 </div>
                 <div className="flex">
@@ -73,10 +73,10 @@ export const UserProfile = () => {
                                 <span className="font-[700] text-[#000000] text-[18px]">Total Manga in List: </span> <span className="text-black text-[18px]">{user?.statistics?.manga?.total_entries || 44}</span>
                             </p>
                             <p className="flex gap-[16px] items-center mb-[12px]">
-                                <span className="font-[700] text-[#000000] text-[18px]">Your</span> <Link to={`/recommendations/manga`} state={{from: '/'}} className='text-[#000000] text-[18px] font-[600] text-center hover:text-[#484444] cursor-pointer underline'>Manga Recommendations</Link>
+                                <span className="font-[700] text-[#000000] text-[18px]">Your</span> <Link to={`/recommendations/anime`} state={{from: '/'}} className='text-[#000000] text-[18px] font-[600] text-center hover:text-[#484444] cursor-pointer underline'>Anime Recommendations</Link>
                             </p>
                             <p className="flex gap-[16px] items-center mb-[12px]">
-                                <span className="font-[700] text-[#000000] text-[18px]">Your</span> <Link to={`/recommendations/anime`} state={{from: '/'}} className='text-[#000000] text-[18px] font-[600] text-center hover:text-[#484444] cursor-pointer underline'>Anime Recommendations</Link>
+                                <span className="font-[700] text-[#000000] text-[18px]">Try: </span> <Link to={`/recommendations/manga`} state={{from: '/'}} className='text-[#000000] text-[18px] font-[600] text-center hover:text-[#484444] cursor-pointer underline'>Compare Animes</Link>
                             </p>
                             <p className="flex gap-[16px] items-center mb-[16px] mt-[128px]">
                                 <span className="font-[700] text-[#000000] text-[18px]">Explore</span> <Link to={`/`} className='text-[#000000] text-[18px] font-[600] text-center hover:text-[#484444] cursor-pointer underline'>Most Popular Anime right now</Link>
@@ -96,7 +96,7 @@ export const UserProfile = () => {
                                 <div className="flex items-center justify-between p-[16px]">
                                     <div className="font-[700] text-[#000000] text-[18px] flex items-center gap-[8px]">
                                         <p>Mean Score: </p>
-                                        <span>{user?.mean_score || 8.85}</span>
+                                        <span>{(Number(user?.mean_score) || 8.85).toFixed(2)}</span>
                                     </div>
                                     <div className="font-[700] text-[#000000] text-[18px] flex items-center gap-[8px]">
                                         <p>Episodes: </p>

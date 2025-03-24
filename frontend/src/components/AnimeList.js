@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Swal from 'sweetalert2';
 
+
 export const AnimeList = () => {
     const { username } = useParams(); // Lấy username từ URL
     console.log("ĐÃ LẤY ĐƯỢC USERNAME: ", username);
@@ -61,7 +62,7 @@ export const AnimeList = () => {
                 }
 
                 const data = await response.json();
-                const animeDetailsPromises = data.map((anime) => fetchAnimeDetails(anime.mal_id));
+                const animeDetailsPromises = data.map((anime) => fetchAnimeDetails(anime.anime_id));
                 const animeDetails = await Promise.all(animeDetailsPromises);
                 const updatedAnimeList = data.map((anime, index) => ({
                     ...anime,
@@ -106,7 +107,7 @@ export const AnimeList = () => {
                             "Authorization": `Bearer ${token}`,
                             "Content-Type": "application/json",
                         },
-                        body: JSON.stringify({ mal_id: malId }),
+                        body: JSON.stringify({ anime_id: malId }),
                     });
 
                     if (!response.ok) {
@@ -114,7 +115,7 @@ export const AnimeList = () => {
                     }
 
                     // Xóa anime khỏi danh sách sau khi xóa thành công
-                    setAnimeList(animeList.filter((anime) => anime.mal_id !== malId));
+                    setAnimeList(animeList.filter((anime) => anime.anime_id !== malId));
                     Swal.fire("Deleted!", "Anime has been removed from your list.", "success");
                     console.log(`Đã xóa anime với mal_id: ${malId}`);
                 } catch (error) {
@@ -147,7 +148,7 @@ export const AnimeList = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    mal_id: malId,
+                    anime_id: malId,
                     my_status: parseInt(newStatus),
                     my_score: parseInt(newScore),
                 }),
@@ -160,7 +161,7 @@ export const AnimeList = () => {
             // Cập nhật danh sách anime sau khi update thành công
             setAnimeList(
                 animeList.map((anime) =>
-                    anime.mal_id === malId
+                    anime.anime_id === malId
                         ? { ...anime, my_score: parseInt(newScore), my_status: parseInt(newStatus) }
                         : anime
                 )
@@ -168,7 +169,17 @@ export const AnimeList = () => {
             setSelectedAnime(null); // Đóng modal
             setNewScore(""); // Reset input
             setNewStatus(""); // Reset input
+
+            Swal.fire({
+                title: "Updated!",
+                text: "Anime đã được cập nhật thành công.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            });
+
             console.log(`Đã cập nhật anime với mal_id: ${malId}`);
+
         } catch (error) {
             console.error("Lỗi khi cập nhật rating:", error.message);
         }
@@ -188,7 +199,12 @@ export const AnimeList = () => {
     }
 
     return (
+
         <div className="bg-[#ffffff] min-h-screen p-[24px]">
+            <Link to="/" className="block bg-[#4F74C8] text-white text-center px-4 py-2 rounded-md hover:bg-[#294586] transition duration-300 mb-4 w-[7%]">
+                    <i className="fa-solid fa-arrow-left mr-2"></i>
+                    Back
+            </Link>
             <div className="text-center text-[28px] text-black font-[700] mb-[64px]">
                 {username}'s AnimeList
             </div>
@@ -210,9 +226,9 @@ export const AnimeList = () => {
                     <tbody>
                         {animeList.map((anime) => (
                             <tr key={anime.rating_id}>
-                                <td className="text-[16px] text-gray-800 font-[500]">{anime.mal_id}</td>
+                                <td className="text-[16px] text-gray-800 font-[500]">{anime.anime_id}</td>
                                 <td>
-                                    <Link to={`/anime/${anime.mal_id}`}>
+                                    <Link to={`/anime/${anime.anime_id}`}>
                                         <img
                                             src={anime.image}
                                             alt={anime.title}
@@ -222,7 +238,7 @@ export const AnimeList = () => {
                                 </td>
                                 <td className="text-[16px] text-gray-800 font-[500]">{anime.title}</td>
                                 <td className="text-[16px] text-gray-800 font-[500] pl-[30px]">
-                                    {new Date(anime.create_at).toLocaleDateString()}
+                                    {new Date(anime.created_at).toLocaleDateString()}
                                 </td>
                                 <td className="text-[16px] text-gray-800 font-[500] pl-[54px]">{anime.my_score}</td>
                                 <td className="text-[16px] text-gray-800 font-[500]">
@@ -231,7 +247,7 @@ export const AnimeList = () => {
                                 <td className="text-[16px] text-gray-600 font-[500]">
                                     <i
                                         className="fa-solid fa-trash ml-[30px] hover:cursor-pointer hover:text-black"
-                                        onClick={() => handleRemove(anime.mal_id)}
+                                        onClick={() => handleRemove(anime.anime_id)}
                                     ></i>
                                 </td>
                                 <td className="text-[18px] text-gray-600 font-[500]">
@@ -287,7 +303,7 @@ export const AnimeList = () => {
                         <div className="modal-action">
                             <button
                                 className="btn btn-primary"
-                                onClick={() => handleUpdate(selectedAnime.mal_id)}
+                                onClick={() => handleUpdate(selectedAnime.anime_id)}
                             >
                                 Save
                             </button>
