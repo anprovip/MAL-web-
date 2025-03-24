@@ -2,18 +2,20 @@ from pydantic import BaseModel, EmailStr, conint, Field
 from datetime import datetime
 from typing import Optional, List
 
-class UserCreate(BaseModel):
+class UserBase(BaseModel):
     username: str
     email: EmailStr
+    class Config:
+        from_attributes = True
+
+class UserCreate(UserBase):
     password: str
     class Config:
         from_attributes = True
 
-class UserOut(BaseModel):
-    user_id: int 
-    email: EmailStr
-    username: str
-    password:str
+
+class UserOut(UserBase):
+    user_id: int
     user_watching: int
     user_completed: int
     user_onhold: int

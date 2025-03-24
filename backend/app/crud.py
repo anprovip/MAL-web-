@@ -145,11 +145,6 @@ def get_anime_by_title(db: Session, title: str):
     )
 
 
-from sqlalchemy.orm import Session
-from sqlalchemy import desc
-from typing import List, Optional, Tuple
-from . import models
-
 def get_animes(
     db: Session, 
     skip: int = 0, 
@@ -162,9 +157,9 @@ def get_animes(
     year: Optional[int] = None,
     min_score: Optional[float] = None,
     sort_by: str = "popularity"
-) -> Tuple[List[models.Anime], int]:
+) -> Tuple[List[schemas.AnimeResponse], int]:
     
-    query = db.query(models.Anime, models.MalStats.score, models.MalStats.scored_by, models.MalStats.rank, models.MalStats.members).join(models.MalStats, models.Anime.mal_id == models.MalStats.anime_id)
+    query = db.query(models.Anime, models.MalStats).join(models.MalStats, models.Anime.mal_id == models.MalStats.anime_id)
     
     # Apply filters
     if title:
@@ -209,19 +204,16 @@ def get_animes(
     # Apply pagination
     results = query.offset(skip).limit(limit).all()
 
-    # Convert to list of dictionaries
+    # Convert to list of AnimeResponse
     animes = []
-    for result in results:
-        anime_obj, score, scored_by, rank, members = result  # Giải nén tuple
-        anime_dict = anime_obj.__dict__.copy()
-        anime_dict.update({
-            "score": score if score is not None else 0.0,  # Đặt giá trị mặc định nếu None
-            "scored_by": scored_by if scored_by is not None else 0,
-            "rank": rank if rank is not None else -1,
-            "members": members if members is not None else 0
-        })
+    for anime, mal_stats in results:
+        anime_dict = anime.__dict__.copy()
         anime_dict.pop("_sa_instance_state", None)
-        animes.append(anime_dict)
+        mal_stats_dict = mal_stats.__dict__.copy()
+        mal_stats_dict.pop("_sa_instance_state", None)
+        anime_dict["mal_stats"] = mal_stats_dict
+        anime_response = schemas.AnimeResponse(**anime_dict)
+        animes.append(anime_response)
 
     return animes, total
 
