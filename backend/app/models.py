@@ -17,18 +17,35 @@ class User(Base):
     user_onhold = Column(Integer, nullable=True, server_default=text('0'))
     user_dropped = Column(Integer, nullable=True, server_default=text('0'))
     user_plantowatch = Column(Integer, nullable=True, server_default=text('0'))
-    total_anime = Column(Integer, nullable=True, server_default=text('0'))
-    mean_score = Column(Float, nullable=True, server_default=text('0'))
     created_at = Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
 
 class Rating(Base):
     __tablename__ = "ratings"
     rating_id = Column(Integer, primary_key=True, nullable=False)
     user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
-    mal_id = Column(Integer, ForeignKey("anime.mal_id", ondelete="CASCADE"), nullable=False)
+    anime_id= Column(Integer, ForeignKey("anime.mal_id", ondelete="CASCADE"), nullable=False)
     my_score = Column(Integer, CheckConstraint("my_score BETWEEN 0 AND 10"), nullable=False,server_default=text('0'))
     my_status = Column(Integer, CheckConstraint("my_status IN (1,2,3,4,5)"), nullable=False)
-    create_at=  Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+    created_at=  Column(TIMESTAMP(timezone=True), nullable=False, server_default=text('now()'))
+class UserStats(Base):
+    __tablename__ = "user_stats"
+    user_stats_id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True, nullable=False)
+    total_anime = Column(Integer, nullable=False, server_default=text('0'))
+    total_anime_rated = Column(Integer, nullable=False, server_default=text('0'))
+    mean_score = Column(Float, nullable=False, server_default=text('0'))
+
+class MalStats(Base):
+    __tablename__ = "mal_stats"
+    mal_stats_id = Column(Integer, primary_key=True, nullable=False)
+    anime_id = Column(Integer, ForeignKey("anime.mal_id", ondelete="CASCADE"), nullable=False)
+    score = Column(Float, nullable=True, server_default=text('0'))
+    scored_by = Column(Integer, nullable=True, server_default=text('0'))
+    rank = Column(Integer, nullable=True, server_default=text('0'))
+    members = Column(Integer, nullable=True, server_default=text('0'))
+    popularity = Column(Integer, nullable=True, server_default=text('0'))
+    anime = relationship("Anime", back_populates="mal_stats")
+
 
 # Bảng liên kết anime_genres
 anime_genres = Table(
@@ -157,11 +174,9 @@ class Anime(Base):
     rating = Column(String(100))
     
     # Thống kê
-    score = Column(Float, index=True)
-    scored_by = Column(Float)
-    rank = Column(Integer, index=True)
+   
     popularity = Column(Integer, index=True)
-    members = Column(Integer)
+
     favorites = Column(Integer)
     
     # Thời gian
@@ -221,3 +236,4 @@ class Anime(Base):
     producers = relationship('Producer', secondary=anime_producers, back_populates='animes')
     licensors = relationship('Licensor', secondary=anime_licensors, back_populates='animes')
     studios = relationship('Studio', secondary=anime_studios, back_populates='animes')
+    mal_stats = relationship("MalStats", back_populates="anime", uselist=False, cascade="all, delete-orphan")

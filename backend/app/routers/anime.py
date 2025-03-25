@@ -2,10 +2,11 @@
 from fastapi import APIRouter, HTTPException, Response, status, Depends, Path, Query
 from sqlalchemy.orm import Session
 from ..database import get_db
-from .. import models, schemas, crud
+from .. import models, schemas, crud, oauth2
 from typing import Optional, List, Dict
+from datetime import datetime, timezone
 import math
-from ..recommendation_engine import find_similar_animes
+from ..recommendation_engine import find_similar_animes, recommend_animes_for_user
 from ..compare_anime import compare_anime
 router = APIRouter(prefix="/animes", tags=['Animes'])
 
@@ -152,7 +153,58 @@ def get_similar_animes(
 async def compare_two_anime(anime_id1: int, anime_id2: int, db: Session = Depends(get_db)):
     return compare_anime(anime_id1, anime_id2, db)
 
+from datetime import datetime, timezone
 
+@router.get("/anime/recommendation", response_model=List[schemas.AnimeBase])
+def get_anime_recommendations(
+    current_user: models.User = Depends(oauth2.get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Lấy danh sách anime được đề xuất cho người dùng
+    """
+    user_id = current_user.user_id
+
+    # Kiểm tra người dùng từng vote bao giờ chưa
+    first_rating_time = crud.get_user_first_vote_time(db, user_id)
+    if not first_rating_time:
+        # Nếu người dùng chưa vote bao giờ, gợi ý top 10 anime hot nhất năm hiện tại
+        #current_year = datetime.now().year
+        current_year = 2018
+        top_animes = crud.get_top_animes_by_year(db, year=current_year, limit=10)
+        return top_animes
+
+    # Kiểm tra dữ liệu của người dùng đã được train chưa
+    model_last_trained_time = datetime(2025, 3, 24, 12, 0, 0, tzinfo=timezone.utc)  # Example: March 23, 2020, 12:00:00 PM UTC
+    if first_rating_time > model_last_trained_time:
+        # Nếu người dùng vote rồi mà chưa được train, lấy ra những anime họ vote có điểm trên 7
+        high_rated_animes = crud.get_user_rated_animes(db, user_id, min_score=7, limit=10)
+        if high_rated_animes:
+            similar_animes = []
+            for anime_id, _ in high_rated_animes:  # Extract only the anime_id
+                similar_animes.extend(find_similar_animes(db, mal_id=anime_id, n=10))
+            return similar_animes
+
+    # Gọi hàm để lấy danh sách ID anime được đề xuất
+    n_similar_users: int = 10
+    n_recommendations: int = 10
+    recommended_anime_ids = recommend_animes_for_user(
+        db=db,
+        user_id=user_id,
+        n_similar_users=n_similar_users,
+        n_recommendations=n_recommendations
+    )
+    if not recommended_anime_ids:
+        return []
+    
+    # Lấy thông tin chi tiết của các anime
+    recommended_animes = []
+    for anime_id in recommended_anime_ids:
+        anime = crud.get_anime(db, anime_id)
+        if anime:
+            recommended_animes.append(anime)
+    
+    return recommended_animes
 
 # ----- Stats Endpoint -----
 @router.get("/stats/", tags=["Stats"])

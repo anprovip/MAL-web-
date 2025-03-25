@@ -3,8 +3,12 @@ from . import models
 from .database import engine, get_db
 from .routers import  user, auth,anime,rating
 from .config import settings
+from .scheduled_tasks import start_scheduler
 from fastapi.middleware.cors import CORSMiddleware
-
+#uvicorn app.main:app --reload 
+#venv\Scripts\activate.bat
+#docker compose up -d
+#python import_data.py
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -25,6 +29,10 @@ app.include_router(rating.router)
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+@app.on_event("startup")
+def startup_scheduler():
+    start_scheduler()
 
 
 

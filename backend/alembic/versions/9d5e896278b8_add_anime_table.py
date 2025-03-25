@@ -88,11 +88,7 @@ def upgrade() -> None:
         sa.Column('airing', sa.Boolean(), nullable=True),
         sa.Column('duration', sa.String(length=100), nullable=True),
         sa.Column('rating', sa.String(length=100), nullable=True),
-        sa.Column('score', sa.Float(), nullable=True),
-        sa.Column('scored_by', sa.Float(), nullable=True),
-        sa.Column('rank', sa.Integer(), nullable=True),
         sa.Column('popularity', sa.Integer(), nullable=True),
-        sa.Column('members', sa.Integer(), nullable=True),
         sa.Column('favorites', sa.Integer(), nullable=True),
         sa.Column('season', sa.String(length=50), nullable=True),
         sa.Column('year', sa.Float(), nullable=True),
@@ -131,7 +127,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('mal_id')
     )
 
-    # Tạo bảng liên kết anime_genres
+    #Tạo bảng liên kết anime_genres
     op.create_table(
         'anime_genres',
         sa.Column('anime_id', sa.Integer(), nullable=False),
@@ -191,13 +187,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('anime_id', 'studio_id')
     )
 
-    # Index để tăng tốc truy vấn
-    op.create_index(op.f('ix_anime_score'), 'anime', ['score'], unique=False)
-    op.create_index(op.f('ix_anime_rank'), 'anime', ['rank'], unique=False)
-    op.create_index(op.f('ix_anime_popularity'), 'anime', ['popularity'], unique=False)
-    op.create_index(op.f('ix_anime_title'), 'anime', ['title'], unique=False)
-    op.create_index(op.f('ix_anime_year'), 'anime', ['year'], unique=False)
-    op.create_index(op.f('ix_anime_season'), 'anime', ['season'], unique=False)
 
 
 def downgrade() -> None:
